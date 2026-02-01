@@ -25,7 +25,7 @@ const App = () => {
     const [winningCells, setWinningCells] = useState([]);
     const [floatingWins, setFloatingWins] = useState([]);
 
-    // Buff State
+    // Buff State (What the user owns)
     const [buffs, setBuffs] = useState({
         juiceBox: false,
         grapeLove: false,
@@ -33,13 +33,28 @@ const App = () => {
         investor: false
     });
 
+    // Active State (What is currently applied to the visual grid)
+    const [activeBuffsInPlay, setActiveBuffsInPlay] = useState({
+        juiceBox: false,
+        grapeLove: false,
+        halloween: false,
+        investor: false
+    });
+
     const [juiceBoxActiveNext, setJuiceBoxActiveNext] = useState(false);
+    const [juiceBoxInPlay, setJuiceBoxInPlay] = useState(false);
     const [investorCount, setInvestorCount] = useState(0);
+    const [activeInvestorCount, setActiveInvestorCount] = useState(0);
 
     const buyBuff = (type) => {
         if (balance >= BUFF_COST && !buffs[type]) {
             setBalance(prev => prev - BUFF_COST);
             setBuffs(prev => ({ ...prev, [type]: true }));
+
+            // Specifically reset investor count upon purchase so it starts fresh
+            if (type === 'investor') {
+                setInvestorCount(0);
+            }
         }
     };
 
@@ -64,7 +79,8 @@ const App = () => {
         }, 1500);
     };
 
-    const calculateResults = (newGrid) => {
+    // UPDATED: Now accepts explicit state snapshots to avoid stale closures
+    const calculateResults = (newGrid, currentJuiceInPlay, currentBuffs, currentInvCount) => {
         let totalWin = 0;
         let fruitWinOccurred = false;
         let winningIndices = [];
@@ -82,8 +98,9 @@ const App = () => {
                     let rowWin = 0;
                     if (SYMBOLS.FRUIT.includes(nonCandy)) {
                         let multiplier = 1;
-                        if (juiceBoxActiveNext) multiplier *= 5;
-                        if (buffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
+                        // Use the passed snapshot value
+                        if (currentJuiceInPlay) multiplier *= 5;
+                        if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
                         rowWin = 10 * multiplier;
                         fruitWinOccurred = true;
                     } else if (nonCandy === SYMBOLS.DIAMOND) {
@@ -100,15 +117,17 @@ const App = () => {
         });
 
         // Money Bags
+        let bagsFound = false;
         newGrid.flat().forEach((s, idx) => {
             if (s === SYMBOLS.MONEY) {
+                bagsFound = true;
                 let bagWin = 10;
-                if (buffs.investor) {
-                    if (investorCount % 3 === 2) bagWin = 50;
+                if (currentBuffs.investor) {
+                    if (currentInvCount % 3 === 2) bagWin = 50;
                     else bagWin = 0;
                 }
 
-                if (bagWin > 0 || (buffs.investor && investorCount % 3 !== 2)) {
+                if (bagWin > 0 || (currentBuffs.investor && currentInvCount % 3 !== 2)) {
                     winningIndices.push(idx);
                     if (bagWin > 0) {
                         totalWin += bagWin;
@@ -118,17 +137,27 @@ const App = () => {
             }
         });
 
-        if (newGrid.flat().includes(SYMBOLS.MONEY)) {
+        if (bagsFound) {
             setInvestorCount(prev => prev + 1);
         }
 
-        setJuiceBoxActiveNext(buffs.juiceBox && fruitWinOccurred);
+        setJuiceBoxActiveNext(currentBuffs.juiceBox && fruitWinOccurred);
         setWinningCells(winningIndices);
         return totalWin;
     };
 
     const handleSpin = () => {
         if (balance < 1 || isSpinning) return;
+
+        // CAPTURE SNAPSHOTS IMMEDIATELY
+        const snapshotBuffs = { ...buffs };
+        const snapshotJuice = juiceBoxActiveNext;
+        const snapshotInvCount = investorCount;
+
+        // Apply snapshots to visual state
+        setActiveBuffsInPlay(snapshotBuffs);
+        setJuiceBoxInPlay(snapshotJuice);
+        setActiveInvestorCount(snapshotInvCount);
 
         setBalance(prev => prev - 1);
         setIsSpinning(true);
@@ -147,7 +176,6 @@ const App = () => {
             [flatResults[6], flatResults[7], flatResults[8]]
         ];
 
-        // Reveal Column 0, then 1, then 2
         [0, 1, 2].forEach((col, i) => {
             setTimeout(() => {
                 setGrid(prev => {
@@ -161,13 +189,14 @@ const App = () => {
 
                 if (col === 2) {
                     setTimeout(() => {
-                        const win = calculateResults(nextGrid);
+                        // PASS SNAPSHOTS INTO CALCULATION
+                        const win = calculateResults(nextGrid, snapshotJuice, snapshotBuffs, snapshotInvCount);
                         setLastWin(win);
                         setBalance(prev => prev + win);
                         setIsSpinning(false);
                     }, 400);
                 }
-            }, i * 450); // Significant pause between columns for anticipation
+            }, i * 450);
         });
     };
 
@@ -204,12 +233,17 @@ const App = () => {
                         const isRevealed = revealingColumn >= col || !isSpinning;
                         const isWinning = winningCells.includes(idx) && !isSpinning;
 
+                        let displaySymbol = symbol;
+                        if (symbol === SYMBOLS.MONEY && activeBuffsInPlay.investor && (activeInvestorCount % 3 !== 2)) {
+                            displaySymbol = '🏦';
+                        }
+
                         return (
                             <div key={idx} className="relative bg-white rounded-[1.5rem] flex items-center justify-center overflow-hidden shadow-sm border border-stone-50">
                                 <AnimatePresence mode="wait">
                                     {isRevealed ? (
                                         <motion.div
-                                            key={`${idx}-${symbol}`}
+                                            key={`${idx}-${displaySymbol}`}
                                             initial={{ y: -100, opacity: 0, scale: 0.8 }}
                                             animate={{
                                                 y: 0,
@@ -224,9 +258,21 @@ const App = () => {
                                                 scale: { repeat: isWinning ? Infinity : 0, duration: 1, ease: "easeInOut" },
                                                 rotate: { repeat: isWinning ? Infinity : 0, duration: 0.5 }
                                             }}
-                                            className={`text-5xl sm:text-6xl z-10 ${isWinning ? 'drop-shadow-lg' : ''}`}
+                                            className={`text-5xl sm:text-6xl z-10 ${isWinning ? 'drop-shadow-lg' : ''} relative`}
                                         >
-                                            {symbol}
+                                            {displaySymbol}
+
+                                            <div className="absolute inset-0 pointer-events-none">
+                                                {juiceBoxInPlay && SYMBOLS.FRUIT.includes(symbol) && (
+                                                    <span className="absolute -top-2 -left-2 text-sm drop-shadow-sm">🧃</span>
+                                                )}
+                                                {activeBuffsInPlay.grapeLove && symbol === '🍇' && (
+                                                    <span className="absolute -bottom-2 -right-2 text-sm drop-shadow-sm">💜</span>
+                                                )}
+                                                {activeBuffsInPlay.halloween && symbol === SYMBOLS.CANDY && (
+                                                    <span className="absolute -bottom-2 -right-2 text-sm drop-shadow-sm">🎃</span>
+                                                )}
+                                            </div>
                                         </motion.div>
                                     ) : (
                                         <motion.div
@@ -247,11 +293,6 @@ const App = () => {
                                         animate={{ opacity: 1 }}
                                         className="absolute inset-0 bg-amber-400/5 border-2 border-amber-400/20 rounded-[1.5rem] z-0"
                                     />
-                                )}
-
-                                {/* Juice Box Next Indicator */}
-                                {juiceBoxActiveNext && SYMBOLS.FRUIT.includes(symbol) && !isSpinning && (
-                                    <Zap size={14} className="absolute top-2 right-2 text-blue-500 fill-blue-500 animate-pulse z-20" />
                                 )}
                             </div>
                         );
@@ -303,7 +344,10 @@ const App = () => {
                     <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-400 flex items-center gap-2">
                         <ShoppingCart size={12} /> Buff Marketplace
                     </h2>
-                    <span className="text-[10px] font-bold text-stone-300">Tokens: 15</span>
+                    <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold text-stone-300">Cost: 15</span>
+                        {juiceBoxActiveNext && <Zap size={14} className="text-blue-500 fill-blue-500 animate-pulse" />}
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     <BuffCard
@@ -340,14 +384,13 @@ const App = () => {
             </div>
 
             {/* Legend / Payout Section */}
-            <div className="w-full max-w-md mt-12 bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm">
+            <div className="w-full max-w-md mt-12 bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm mb-12">
                 <div className="flex items-center gap-2 mb-6 border-b border-stone-100 pb-4">
                     <HelpCircle size={18} className="text-stone-400" />
                     <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Payout & Probability Legend</h2>
                 </div>
 
                 <div className="space-y-6">
-                    {/* Symbols Grid */}
                     <div className="grid grid-cols-1 gap-4">
                         <LegendItem
                             symbol="🍇🍌🍒🍑"
@@ -379,7 +422,6 @@ const App = () => {
                         />
                     </div>
 
-                    {/* Quick Rules */}
                     <div className="bg-stone-50 rounded-2xl p-4">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 flex items-center gap-2">
                             <Info size={12} /> Standard Rules
@@ -388,15 +430,10 @@ const App = () => {
                             <li>• Each spin costs <span className="font-bold text-stone-900">1 Token</span>.</li>
                             <li>• Wins are calculated <span className="font-bold text-stone-900">Left-to-Right</span> for row matches.</li>
                             <li>• Buffs are <span className="font-bold text-stone-900">permanent</span> for the duration of the session.</li>
-                            <li>• Symbols are generated using a weighted pool for varying rarity.</li>
+                            <li>• Visual cues (💜, 🎃, 🧃) update only on the <span className="font-bold text-stone-900">next spin</span>.</li>
                         </ul>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer */}
-            <div className="mt-8 mb-12 text-[10px] font-bold text-stone-300 uppercase tracking-widest">
-                Good luck, player
             </div>
         </div>
     );
