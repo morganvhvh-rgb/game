@@ -1,28 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, ShoppingCart, Zap, Star, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Tag } from 'lucide-react';
+import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles } from 'lucide-react';
+import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS } from './data/gameConfig';
+import PlayingCard from './components/PlayingCard';
+import DealOption from './components/DealOption';
+import LegendItem from './components/LegendItem';
 
 // Configuration
-const SYMBOLS = {
-    FRUIT: ['🍇', '🍌', '🍒', '🍑'],
-    CANDY: '🍬',
-    DIAMOND: '💎',
-    MONEY: '💰',
-    BOMB: '💣'
-};
-
-const LOCK_COST = 50;
-const LOCK_DURATION = 9;
-
-// Buff Master List
-const BUFF_DEFINITIONS = [
-    { id: 'juiceBox', icon: '🧃', title: 'Juice Box', desc: 'Fruit win → Next fruit 5x payout' },
-    { id: 'grapeLove', icon: '💜', title: 'Grape Love', desc: 'Grapes are worth 2x' },
-    { id: 'orangutan', icon: '🦧', title: 'Orangutan', desc: 'Allows vertical matches for Bananas' },
-    { id: 'mining', icon: '⛏', title: 'Mining', desc: 'Bomb match triggers 3 diamond spins' },
-    { id: 'halloween', icon: '🎃', title: 'Halloween', desc: 'Adds extra Candy Wilds / Anti-Bomb' },
-    { id: 'investor', icon: '🏦', title: 'Investor', desc: 'Money Bags pay 0, 0, then 5x' }
-];
+// Configuration loaded from gameConfig.js
 
 const App = () => {
     const [balance, setBalance] = useState(150);
@@ -190,7 +175,7 @@ const App = () => {
                     let rowWin = 0;
                     if (SYMBOLS.FRUIT.includes(nonCandy)) {
                         let multiplier = 1;
-                        if (currentJuiceInPlay) multiplier *= 5;
+                        if (currentJuiceInPlay) multiplier *= 4;
                         if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
                         rowWin = 10 * multiplier;
                         fruitWinOccurred = true;
@@ -221,7 +206,7 @@ const App = () => {
                     const isMatch = colSymbols.every(s => s === '🍌' || s === SYMBOLS.CANDY);
                     if (isMatch) {
                         let colWin = 10;
-                        if (currentJuiceInPlay) colWin *= 5;
+                        if (currentJuiceInPlay) colWin *= 4;
                         totalWin += colWin;
                         fruitWinOccurred = true;
                         winningIndices.push(col, col + 3, col + 6);
@@ -504,7 +489,7 @@ const App = () => {
                         <div className="w-full max-w-md mt-10 bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm mb-12">
                             <div className="flex items-center gap-2 mb-6 border-b border-stone-100 pb-4">
                                 <HelpCircle size={18} className="text-stone-400" />
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Payout Legend</h2>
+                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Information</h2>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                                 <LegendItem symbol="🍇" label="Fruits" payout="10" prob="70%" desc="Standard 3-in-a-row fruit match." />
@@ -517,7 +502,12 @@ const App = () => {
 
                     </motion.div>
                 ) : (
-                    <div className="w-full flex flex-col items-center max-w-md">
+                    <motion.div
+                        key="shop"
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="w-full flex flex-col items-center max-w-md"
+                    >
                         {/* Shop Header */}
                         <div className="w-full mb-6">
                             <button
@@ -606,111 +596,13 @@ const App = () => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>
     );
 };
 
-const DealOption = ({ title, desc, cost, count, onClick, disabled, icon }) => (
-    <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`
-            w-full bg-white p-6 rounded-[2rem] border-2 text-left transition-all relative overflow-hidden group
-            ${disabled ? 'border-stone-100 opacity-50 cursor-not-allowed' : 'border-stone-100 hover:border-stone-900 hover:shadow-lg'}
-        `}
-    >
-        <div className="flex justify-between items-start mb-2 relative z-10">
-            <div className="flex items-center gap-3">
-                <div className="p-3 bg-stone-50 rounded-xl group-hover:scale-110 transition-transform">{icon}</div>
-                <div>
-                    <h3 className="font-black text-lg text-stone-900 uppercase tracking-tight leading-none">{title}</h3>
-                    <span className="text-xs font-bold text-stone-400">Deals {count} Cards</span>
-                </div>
-            </div>
-            <div className="flex flex-col items-end">
-                <span className="text-xs font-bold text-stone-400 uppercase tracking-wide">Cost</span>
-                <div className="flex items-center gap-1 text-stone-900 font-black text-xl">
-                    {cost}<Coins size={14} className="text-amber-500 fill-amber-500" />
-                </div>
-            </div>
-        </div>
-        <p className="text-sm text-stone-500 relative z-10">{desc}</p>
-    </button>
-);
 
-const PlayingCard = ({ card, index, owned, balance, onPurchase }) => {
-    const isAffordable = balance >= card.price;
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 50, rotateX: -10 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ delay: index * 0.15, type: "spring", damping: 20 }}
-            className={`
-                relative bg-white rounded-[1.5rem] p-3 shadow-xl border-2 flex flex-col items-center text-center
-                w-1/3 flex-grow-0 min-w-0 aspect-[2/3] sm:aspect-[9/16]
-                ${owned ? 'border-stone-100 bg-stone-50' : 'border-stone-900'}
-            `}
-        >
-            <div className="text-4xl sm:text-5xl mb-2 sm:mb-4 p-2 sm:p-3 bg-stone-50 rounded-full shadow-inner mt-2">{card.icon}</div>
-
-            <h3 className="text-sm sm:text-lg font-black uppercase tracking-tight mb-1 leading-tight">{card.title}</h3>
-            <p className="text-[10px] sm:text-xs text-stone-500 font-medium mb-2 leading-tight px-1 flex-1 flex items-center justify-center">
-                {card.desc}
-            </p>
-
-            <div className="w-full mt-auto">
-                {owned ? (
-                    <div className="w-full py-2 rounded-xl bg-stone-200 text-stone-400 font-bold text-[10px] sm:text-xs uppercase flex items-center justify-center gap-1">
-                        <Star size={12} className="fill-stone-400" /> Owned
-                    </div>
-                ) : (
-                    <button
-                        onClick={onPurchase}
-                        disabled={!isAffordable}
-                        className={`
-                            w-full py-2 sm:py-3 rounded-xl font-black uppercase tracking-tight text-sm sm:text-lg flex items-center justify-center gap-1 sm:gap-2 transition-transform active:scale-95
-                            ${isAffordable ? 'bg-amber-400 text-white shadow-md hover:bg-amber-500' : 'bg-stone-200 text-stone-400 cursor-not-allowed'}
-                        `}
-                    >
-                        <Tag size={14} />
-                        {card.price}
-                    </button>
-                )}
-            </div>
-
-            {/* Rarity/Price Indicator */}
-            {!owned && (
-                <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-                    {card.price < 40 && <div className="bg-green-100 text-green-600 px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-black uppercase">Sale</div>}
-                    {card.price > 40 && <div className="bg-red-100 text-red-500 px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-black uppercase">High</div>}
-                </div>
-            )}
-        </motion.div>
-    );
-};
-
-const LegendItem = ({ symbol, label, payout, prob, desc, isPenalty }) => (
-    <div className="flex items-start gap-3 group">
-        <div className="w-12 h-12 bg-stone-50 rounded-xl flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-            {symbol}
-        </div>
-        <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-[10px] font-black uppercase tracking-tight text-stone-900 truncate">{label}</span>
-                <span className={`text-[8px] px-1 py-0.5 rounded-full font-bold ${parseInt(prob) <= 10 ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-stone-400'}`}>
-                    {prob}
-                </span>
-            </div>
-            <div className={`text-[9px] font-bold uppercase tracking-tighter ${isPenalty ? 'text-red-500' : 'text-green-600'}`}>
-                {payout} Payout
-            </div>
-            <p className="text-[10px] text-stone-400 leading-tight mt-1 line-clamp-2">{desc}</p>
-        </div>
-    </div>
-);
 
 export default App;
