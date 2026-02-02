@@ -17,3 +17,8 @@ export const BUFF_DEFINITIONS = [
     { id: 'halloween', icon: '🎃', title: 'Halloween', desc: 'Adds extra Candy Wilds / Anti-Bomb' },
     { id: 'investor', icon: '🏦', title: 'Investor', desc: 'Money Bags pay 0, 0, then 5x' }
 ];
+
+export const S_TIER_BUFFS = [
+    { id: 'angel', icon: '👼', title: 'Angel Buff', desc: 'S-Tier Placeholder' },
+    { id: 'devil', icon: '😈', title: 'Devil Buff', desc: 'S-Tier Placeholder' }
+];

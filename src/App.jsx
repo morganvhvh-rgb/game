@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles } from 'lucide-react';
-import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS } from './data/gameConfig';
+import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake } from 'lucide-react';
+import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS, S_TIER_BUFFS } from './data/gameConfig';
 import PlayingCard from './components/PlayingCard';
 import DealOption from './components/DealOption';
 import LegendItem from './components/LegendItem';
@@ -47,9 +47,11 @@ const App = () => {
     // Shop State
     const [shopPhase, setShopPhase] = useState('menu'); // 'menu' | 'reveal'
     const [dealtCards, setDealtCards] = useState([]);
+    const [lotteryFail, setLotteryFail] = useState(false);
 
     const enterShop = () => {
         setShopPhase('menu');
+        setLotteryFail(false);
         setView('shop');
     };
 
@@ -83,6 +85,28 @@ const App = () => {
         });
 
         setDealtCards(cards);
+        setDealtCards(cards);
+        setLotteryFail(false);
+        setShopPhase('reveal');
+    };
+
+    const handleLottery = () => {
+        const cost = 100;
+        if (balance < cost) return;
+
+        setBalance(prev => prev - cost);
+
+        const isWin = Math.random() < 0.1;
+
+        if (isWin) {
+            const randomSTier = S_TIER_BUFFS[Math.floor(Math.random() * S_TIER_BUFFS.length)];
+            // Price is 200 for S-Tier Buffs
+            setDealtCards([{ ...randomSTier, price: 200 }]);
+            setLotteryFail(false);
+        } else {
+            setDealtCards([]);
+            setLotteryFail(true);
+        }
         setShopPhase('reveal');
     };
 
@@ -535,35 +559,66 @@ const App = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
-                                    className="w-full space-y-4"
+                                    className="w-full flex flex-col items-center gap-4"
                                 >
-                                    <DealOption
-                                        title="Fair Deal"
-                                        desc="2 cards. Standard pricing."
-                                        cost={10}
-                                        count={2}
-                                        onClick={() => handleDeal('fair')}
-                                        disabled={balance < 10}
-                                        icon={<LayoutGrid className="text-blue-500" />}
-                                    />
-                                    <DealOption
-                                        title="Volatile Deal"
-                                        desc="3 cards. Random prices (25, 40, 55)."
-                                        cost={20}
-                                        count={3}
-                                        onClick={() => handleDeal('volatile')}
-                                        disabled={balance < 20}
-                                        icon={<Zap className="text-amber-500" />}
-                                    />
-                                    <DealOption
-                                        title="Great Deal"
-                                        desc="1 card. Amazing price (10)."
-                                        cost={30}
-                                        count={1}
-                                        onClick={() => handleDeal('great')}
-                                        disabled={balance < 30}
-                                        icon={<Sparkles className="text-purple-500" />}
-                                    />
+                                    <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4">
+                                        <DealOption
+                                            title="Fair Deal"
+                                            desc="2 Buff choices. Standard pricing."
+                                            cost={10}
+                                            count={2}
+                                            onClick={() => handleDeal('fair')}
+                                            disabled={balance < 10}
+                                            icon={<Handshake className="text-blue-500" />}
+                                        />
+                                        <DealOption
+                                            title="Volatile Deal"
+                                            desc="3 Buff choices. Random prices."
+                                            cost={20}
+                                            count={3}
+                                            onClick={() => handleDeal('volatile')}
+                                            disabled={balance < 20}
+                                            icon={<Zap className="text-amber-500" />}
+                                        />
+                                        <DealOption
+                                            title="Great Deal"
+                                            desc="1 Buff choice. Amazing price."
+                                            cost={30}
+                                            count={1}
+                                            onClick={() => handleDeal('great')}
+                                            disabled={balance < 30}
+                                            icon={<Sparkles className="text-purple-500" />}
+                                        />
+                                    </div>
+
+                                    {/* Lottery Option */}
+                                    <button
+                                        onClick={handleLottery}
+                                        disabled={balance < 100}
+                                        className={`
+                                            w-full bg-stone-900 p-4 rounded-[1.5rem] shadow-xl border-2 border-stone-800
+                                            flex items-center justify-between text-white transition-all
+                                            ${balance < 100 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-2xl hover:bg-black'}
+                                        `}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-3 bg-stone-800 rounded-xl border border-stone-700">
+                                                <Star size={24} className="text-yellow-400 animate-pulse" />
+                                            </div>
+                                            <div className="text-left">
+                                                <h3 className="font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
+                                                    Lottery Chance
+                                                </h3>
+                                                <p className="text-xs text-stone-400 font-medium">10% Chance to buy an S-Tier Buff</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">Ticket Price</span>
+                                            <div className="flex items-center gap-1 font-black text-xl text-white">
+                                                100 <Coins size={16} className="text-amber-400 fill-amber-400" />
+                                            </div>
+                                        </div>
+                                    </button>
                                 </motion.div>
                             ) : (
                                 <motion.div
@@ -571,18 +626,26 @@ const App = () => {
                                     className="w-full flex flex-col items-center"
                                 >
                                     {/* Card Container - Side by Side Flex */}
-                                    <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4 mb-6">
-                                        {dealtCards.map((card, idx) => (
-                                            <PlayingCard
-                                                key={`${card.id}-${idx}`}
-                                                card={card}
-                                                index={idx}
-                                                owned={buffs[card.id]}
-                                                balance={balance}
-                                                onPurchase={() => purchaseCard(card)}
-                                            />
-                                        ))}
-                                    </div>
+                                    {lotteryFail ? (
+                                        <div className="w-full h-64 flex flex-col items-center justify-center bg-stone-100 rounded-[2rem] border-2 border-stone-200 mb-6 p-6 text-center animate-in fade-in zoom-in duration-300">
+                                            <div className="text-6xl mb-4 grayscale opacity-50">💔</div>
+                                            <h3 className="text-xl font-black text-stone-400 uppercase tracking-tight mb-2">Lady Luck Frowns</h3>
+                                            <p className="text-stone-500 font-medium max-w-[200px]">The stars did not align this time. Try again?</p>
+                                        </div>
+                                    ) : (
+                                        <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4 mb-6">
+                                            {dealtCards.map((card, idx) => (
+                                                <PlayingCard
+                                                    key={`${card.id}-${idx}`}
+                                                    card={card}
+                                                    index={idx}
+                                                    owned={buffs[card.id]}
+                                                    balance={balance}
+                                                    onPurchase={() => purchaseCard(card)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
 
                                     <motion.button
                                         initial={{ opacity: 0 }}
