@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake } from 'lucide-react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake, TrendingUp } from 'lucide-react';
 import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS, S_TIER_BUFFS } from './data/gameConfig';
 import PlayingCard from './components/PlayingCard';
 import DealOption from './components/DealOption';
@@ -11,7 +11,11 @@ import LegendItem from './components/LegendItem';
 
 const App = () => {
     const [balance, setBalance] = useState(150);
-    const [view, setView] = useState('game'); // 'game' | 'shop'
+    const [spinCost, setSpinCost] = useState(1);
+    const [totalSpins, setTotalSpins] = useState(0);
+    const [nextSpinflationThreshold, setNextSpinflationThreshold] = useState(20);
+    const [showSpinflation, setShowSpinflation] = useState(false);
+    const [view, setView] = useState('game'); // 'game' | 'shop' | 'info'
     const [grid, setGrid] = useState([
         ['🍒', '🍇', '🍌'],
         ['💎', '🍬', '💰'],
@@ -22,6 +26,15 @@ const App = () => {
     const [revealingColumn, setRevealingColumn] = useState(-1);
     const [winningCells, setWinningCells] = useState([]);
     const [floatingWins, setFloatingWins] = useState([]);
+
+    // Animated Balance
+    const balanceMotion = useMotionValue(balance);
+    const displayBalance = useTransform(balanceMotion, (value) => Math.round(value));
+
+    useEffect(() => {
+        const controls = animate(balanceMotion, balance, { duration: 1, ease: "circOut" });
+        return controls.stop;
+    }, [balance]);
 
     const [lockedSymbol, setLockedSymbol] = useState(null);
     const [lockSpinsRemaining, setLockSpinsRemaining] = useState(0);
@@ -201,6 +214,7 @@ const App = () => {
                         let multiplier = 1;
                         if (currentJuiceInPlay) multiplier *= 4;
                         if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
+                        if (currentBuffs.orangutan && nonCandy === '🍌') multiplier *= 2;
                         rowWin = 10 * multiplier;
                         fruitWinOccurred = true;
                     } else if (nonCandy === SYMBOLS.DIAMOND) {
@@ -231,6 +245,7 @@ const App = () => {
                     if (isMatch) {
                         let colWin = 10;
                         if (currentJuiceInPlay) colWin *= 4;
+                        colWin *= 2; // Orangutan 2x Multiplier
                         totalWin += colWin;
                         fruitWinOccurred = true;
                         winningIndices.push(col, col + 3, col + 6);
@@ -275,7 +290,15 @@ const App = () => {
     };
 
     const handleSpin = () => {
-        if (balance < 1 || isSpinning) return;
+        if (balance < spinCost || isSpinning) return;
+
+        // Spinflation Trigger Check
+        if (totalSpins > 0 && totalSpins >= nextSpinflationThreshold) {
+            setNextSpinflationThreshold(prev => prev + 20);
+            setSpinCost(prev => prev * 2);
+            setShowSpinflation(true);
+            return;
+        }
 
         const snapshotBuffs = { ...buffs };
         const snapshotJuice = juiceBoxActiveNext;
@@ -287,7 +310,8 @@ const App = () => {
         setActiveInvestorCount(snapshotInvCount);
         setActiveMiningTurns(snapshotMiningTurns);
 
-        setBalance(prev => prev - 1);
+        setBalance(prev => prev - spinCost);
+        setTotalSpins(prev => prev + 1);
         setIsSpinning(true);
         setLastWin(0);
         setWinningCells([]);
@@ -354,14 +378,14 @@ const App = () => {
             <div className="w-full max-w-md flex justify-between items-center mb-6 bg-white px-6 py-4 rounded-[2rem] shadow-sm border border-stone-200 sticky top-4 z-50">
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-3">
-                        <div className="bg-amber-400 p-2 rounded-xl text-white shadow-sm shrink-0">
-                            <Coins size={20} />
+                        <div className="text-amber-400 shrink-0">
+                            <Coins size={32} />
                         </div>
-                        <span className="text-3xl font-black tabular-nums tracking-tighter leading-none">{balance}</span>
+                        <motion.span className="text-3xl font-black tabular-nums tracking-tighter leading-none">{displayBalance}</motion.span>
                     </div>
                     {/* Active Buffs Indicators */}
                     <div className="flex gap-2">
-                        {buffs.mining && miningTurns > 0 && <div className="text-cyan-500 font-black flex items-center gap-1"><Hammer size={12} /> {miningTurns}</div>}
+                        {buffs.mining && miningTurns > 0 && <div className="text-cyan-500 font-black flex items-center gap-1"><span className="text-sm">💥</span> {miningTurns}</div>}
                         {lockedSymbol && <div className="text-amber-500 font-black flex items-center gap-1"><Lock size={12} /> {lockSpinsRemaining}</div>}
                     </div>
                 </div>
@@ -427,7 +451,7 @@ const App = () => {
                                                             {activeBuffsInPlay.grapeLove && symbol === '🍇' && <span className="absolute -bottom-3 -right-3 text-2xl">💜</span>}
                                                             {activeBuffsInPlay.halloween && symbol === SYMBOLS.CANDY && <span className="absolute -bottom-3 -right-3 text-2xl">🎃</span>}
                                                             {activeBuffsInPlay.orangutan && symbol === '🍌' && <span className="absolute -top-3 -right-3 text-2xl">🦧</span>}
-                                                            {activeMiningTurns > 0 && symbol === SYMBOLS.DIAMOND && <span className="absolute -bottom-3 -right-3 text-2xl">⛏</span>}
+                                                            {activeMiningTurns > 0 && symbol === SYMBOLS.DIAMOND && <span className="absolute -bottom-3 -right-3 text-2xl">💥</span>}
                                                         </div>
                                                     </motion.div>
                                                 ) : (
@@ -488,13 +512,16 @@ const App = () => {
                                 onClick={handleSpin}
                                 disabled={isSpinning || balance < 1}
                                 className={`
-                                    w-full py-7 rounded-[2rem] text-2xl font-black uppercase tracking-tight transition-all shadow-xl
+                                    w-full py-5 rounded-[2rem] text-2xl font-black uppercase tracking-tight transition-all shadow-xl
                                     ${isSpinning || balance < 1
                                         ? 'bg-stone-200 text-stone-400 cursor-not-allowed shadow-none'
                                         : 'bg-stone-900 text-stone-50 hover:bg-black'}
                                 `}
                             >
-                                {isSpinning ? 'Good Luck...' : 'Pull Lever'}
+                                <span className="flex flex-col items-center leading-none gap-1">
+                                    <span>{isSpinning ? 'SPINNING...' : 'Pull Lever'}</span>
+                                    <span className={`text-xs font-bold tracking-wide ${isSpinning ? 'opacity-0' : 'opacity-50'}`}>{spinCost} Coin{spinCost > 1 ? 's' : ''}</span>
+                                </span>
                             </motion.button>
 
                             <motion.button
@@ -507,25 +534,18 @@ const App = () => {
                                 <Store size={20} />
                                 Buff Marketplace
                             </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => setView('info')}
+                                className="w-full py-4 mt-3 rounded-[1.5rem] bg-white text-stone-500 font-bold border-2 border-stone-100 hover:text-stone-900 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Info size={20} />
+                                Game Information
+                            </motion.button>
                         </div>
-
-                        {/* Legend / Payout Section */}
-                        <div className="w-full max-w-md mt-10 bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm mb-12">
-                            <div className="flex items-center gap-2 mb-6 border-b border-stone-100 pb-4">
-                                <HelpCircle size={18} className="text-stone-400" />
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Information</h2>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
-                                <LegendItem symbol="🍇" label="Fruits" payout="10" prob="70%" desc="Standard 3-in-a-row fruit match." />
-                                <LegendItem symbol="💣" label="Bomb" payout="-50" prob="20%" desc="Avoid aligning 3 bombs!" isPenalty={true} />
-                                <LegendItem symbol="💎" label="Diamond" payout="100" prob="3%" desc="The rare jackpot symbol." />
-                                <LegendItem symbol="🍬" label="Candy" payout="Match" prob="4%" desc="Wild symbol. 1 per spin." />
-                                <LegendItem symbol="💰" label="Money" payout="10/bag" prob="6%" desc="Pays instantly on appearance." />
-                            </div>
-                        </div>
-
                     </motion.div>
-                ) : (
+                ) : view === 'shop' ? (
                     <motion.div
                         key="shop"
                         initial={{ opacity: 1 }}
@@ -660,9 +680,71 @@ const App = () => {
                             )}
                         </AnimatePresence>
                     </motion.div>
+                ) : (
+                    <motion.div
+                        key="info"
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="w-full flex flex-col items-center max-w-md"
+                    >
+                        {/* Info Header */}
+                        <div className="w-full mb-6">
+                            <button
+                                onClick={() => setView('game')}
+                                className="flex items-center gap-2 text-stone-500 hover:text-stone-900 font-bold transition-colors mb-4"
+                            >
+                                <ArrowLeft size={18} />
+                                Back to Game
+                            </button>
+
+                            <div className="bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm mb-12 w-full">
+                                <div className="flex items-center gap-2 mb-6 border-b border-stone-100 pb-4">
+                                    <HelpCircle size={18} className="text-stone-400" />
+                                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Information</h2>
+                                </div>
+                                <div className="grid grid-cols-1 gap-y-8">
+                                    <LegendItem symbol="🍇" label="Fruits" payout="10" prob="70%" desc="Standard 3-in-a-row fruit match." />
+                                    <LegendItem symbol="💣" label="Bomb" payout="-50" prob="20%" desc="Avoid aligning 3 bombs!" isPenalty={true} />
+                                    <LegendItem symbol="💎" label="Diamond" payout="100" prob="3%" desc="The rare jackpot symbol." />
+                                    <LegendItem symbol="🍬" label="Candy" payout="Match" prob="4%" desc="Wild symbol. 1 per spin." />
+                                    <LegendItem symbol="💰" label="Money" payout="10/bag" prob="6%" desc="Pays instantly on appearance." />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+
+            {/* Spinflation Modal */}
+            <AnimatePresence>
+                {showSpinflation && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="bg-black rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-4 border-red-600 relative overflow-hidden"
+                        >
+                            <div className="mb-4 bg-stone-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border border-red-900/50">
+                                <TrendingUp size={40} />
+                            </div>
+
+                            <h2 className="text-3xl font-black text-red-600 uppercase tracking-tighter mb-2">Spinflation</h2>
+                            <p className="text-white font-bold text-lg mb-8 leading-tight">
+                                Spins are now <span className="text-red-600 text-2xl inline-block mt-1">{spinCost} coins</span>.
+                            </p>
+
+                            <button
+                                onClick={() => setShowSpinflation(false)}
+                                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl uppercase tracking-widest transition-colors shadow-lg hover:shadow-red-500/30 ring-offset-2 focus:ring-2 ring-red-500 ring-offset-black"
+                            >
+                                PROCEED
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </div >
     );
 };
 
