@@ -365,9 +365,9 @@ const App = () => {
                             if (prev === 0) setLockedSymbol(null);
                             return prev;
                         });
-                    }, 400);
+                    }, 600);
                 }
-            }, i * 450);
+            }, i * 400);
         });
     };
 
@@ -395,7 +395,7 @@ const App = () => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className={`font-black text-sm uppercase tracking-widest whitespace-nowrap ${lastWin < 0 ? 'text-red-500' : 'text-green-500'}`}
+                            className={`font-black text-xl uppercase tracking-widest whitespace-nowrap ${lastWin < 0 ? 'text-red-500' : 'text-green-500'}`}
                         >
                             {lastWin < 0 ? `Penalty ${lastWin}` : `+${lastWin}`}
                         </motion.div>
@@ -439,9 +439,9 @@ const App = () => {
                                                 {isRevealed || (isTopLeft && lockedSymbol && isSpinning) ? (
                                                     <motion.div
                                                         key={`${idx}-${displaySymbol}`}
-                                                        initial={isTopLeft && lockedSymbol ? { y: 0, opacity: 1, scale: 1 } : { y: -100, opacity: 0, scale: 0.8 }}
-                                                        animate={{ y: 0, opacity: 1, scale: isWinning ? [1, 1.15, 1] : 1, rotate: isWinning ? [0, -3, 3, 0] : 0 }}
-                                                        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                                                        initial={isTopLeft && lockedSymbol ? { x: 0, opacity: 1, scale: 1 } : { x: -100, opacity: 0, scale: 0.8 }}
+                                                        animate={{ x: 0, opacity: 1, scale: isWinning ? [1, 1.15, 1] : 1, rotate: isWinning ? [0, -3, 3, 0] : 0 }}
+                                                        transition={{ type: "spring", stiffness: 260, damping: 20, delay: isWinning ? 0 : (Math.floor(idx / 3) * 0.1) }}
                                                         className={`text-5xl sm:text-6xl z-10 ${isWinning ? 'drop-shadow-lg' : ''} relative`}
                                                     >
                                                         {displaySymbol}
@@ -475,7 +475,7 @@ const App = () => {
                                                 <motion.div
                                                     initial={{ opacity: 0 }}
                                                     animate={{ opacity: 1 }}
-                                                    className={`absolute inset-0 border-2 rounded-[1.5rem] z-0 ${grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB ? 'bg-red-400/5 border-red-400/20' : 'bg-amber-400/5 border-amber-400/20'}`}
+                                                    className={`absolute inset-0 border-2 rounded-[1.5rem] z-0 ${grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB ? 'bg-red-400/40 border-red-400/50' : 'bg-amber-400/40 border-amber-400/50'}`}
                                                 />
                                             )}
                                         </div>
@@ -489,10 +489,10 @@ const App = () => {
                                     <motion.div
                                         key={win.id}
                                         initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                                        animate={{ opacity: 1, y: -100, scale: 1.4 }}
+                                        animate={{ opacity: 1, y: -40, scale: 1.0 }}
                                         exit={{ opacity: 0 }}
-                                        transition={{ duration: 1, ease: "backOut" }}
-                                        className={`absolute z-50 pointer-events-none font-black drop-shadow-sm text-3xl ${win.val < 0 ? 'text-red-500' : 'text-green-600'}`}
+                                        transition={{ duration: 1.5, ease: "backOut" }}
+                                        className={`absolute z-50 pointer-events-none font-black drop-shadow-sm text-2xl ${win.val < 0 ? 'text-red-500' : 'text-green-600'}`}
                                         style={{
                                             left: `${(win.cellIndex % 3) * 33 + 16}%`,
                                             top: `${Math.floor(win.cellIndex / 3) * 33 + 16}%`
