@@ -371,6 +371,8 @@ const App = () => {
         });
     };
 
+    const activeBuffList = [...BUFF_DEFINITIONS, ...S_TIER_BUFFS].filter(b => buffs[b.id]);
+
     return (
         <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-4 md:p-8 select-none">
 
@@ -515,6 +517,56 @@ const App = () => {
                                         {win.val > 0 ? `+${win.val}` : win.val}
                                     </motion.div>
                                 ))}
+                            </AnimatePresence>
+                        </div>
+
+                        <div className="w-full relative h-28 mb-2 flex items-center justify-center">
+                            <AnimatePresence mode="popLayout">
+                                {activeBuffList.length === 0 ? (
+                                    <motion.div
+                                        key="buff-empty"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        className="absolute inset-0 flex items-center justify-center"
+                                    >
+                                        <div className="text-stone-300 text-xs font-bold uppercase tracking-widest border-2 border-dashed border-stone-200/50 rounded-xl px-8 py-4">
+                                            Buff Deck Empty
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="buff-list"
+                                        className="relative flex items-center justify-center -space-x-6"
+                                    >
+                                        {activeBuffList.map((buff, i) => (
+                                            <motion.div
+                                                key={buff.id}
+                                                layout
+                                                initial={{ scale: 0, y: 50, rotate: 0 }}
+                                                animate={{
+                                                    scale: 1,
+                                                    y: 0,
+                                                    rotate: (i - (activeBuffList.length - 1) / 2) * 10
+                                                }}
+                                                exit={{ scale: 0, opacity: 0 }}
+                                                whileHover={{ scale: 1.15, y: -20, rotate: 0, zIndex: 50 }}
+                                                className="w-20 h-28 bg-white rounded-xl shadow-xl border border-stone-100 flex flex-col items-center justify-between p-2 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl"
+                                                style={{ zIndex: i }}
+                                            >
+                                                <div className="absolute top-1 right-1 opacity-20"><Sparkles size={8} /></div>
+                                                <div className="flex-1 flex items-center justify-center">
+                                                    <span className="text-4xl filter drop-shadow-sm">{buff.icon}</span>
+                                                </div>
+                                                <div className="w-full border-t border-stone-100 pt-1">
+                                                    <div className="text-[0.55rem] leading-none font-black uppercase text-stone-500 text-center w-full truncate h-3">
+                                                        {buff.title}
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                )}
                             </AnimatePresence>
                         </div>
 
