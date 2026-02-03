@@ -520,7 +520,8 @@ const App = () => {
                             </AnimatePresence>
                         </div>
 
-                        <div className="w-full relative h-28 mb-2 flex items-center justify-center">
+                        {/* Buff Deck Display */}
+                        <div className="w-full relative h-28 -mt-8 z-20 mb-2 flex items-center justify-center pointer-events-none">
                             <AnimatePresence mode="popLayout">
                                 {activeBuffList.length === 0 ? (
                                     <motion.div
@@ -551,10 +552,10 @@ const App = () => {
                                                 }}
                                                 exit={{ scale: 0, opacity: 0 }}
                                                 whileHover={{ scale: 1.15, y: -20, rotate: 0, zIndex: 50 }}
-                                                className="w-20 h-28 bg-white rounded-xl shadow-xl border border-stone-100 flex flex-col items-center justify-between p-2 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl"
+                                                className="w-18 h-24 bg-white rounded-xl shadow-xl border border-stone-100 flex flex-col items-center justify-between p-2 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl pointer-events-auto"
                                                 style={{ zIndex: i }}
                                             >
-                                                <div className="absolute top-1 right-1 opacity-20"><Sparkles size={8} /></div>
+                                                <div className="absolute top-1 left-1"><Dumbbell size={10} className="fill-black text-black" /></div>
                                                 <div className="flex-1 flex items-center justify-center">
                                                     <span className="text-4xl filter drop-shadow-sm">{buff.icon}</span>
                                                 </div>
@@ -595,9 +596,9 @@ const App = () => {
                                 whileTap={{ scale: 0.97 }}
                                 onClick={enterShop}
                                 disabled={isSpinning}
-                                className="w-full py-4 rounded-[1.5rem] bg-white text-stone-900 font-bold border-2 border-stone-100 hover:border-amber-200 transition-colors flex items-center justify-center gap-2"
+                                className="w-full py-4 rounded-[1.5rem] bg-white text-stone-900 font-black uppercase tracking-tight border-2 border-stone-100 hover:border-amber-200 transition-colors flex items-center justify-center gap-2"
                             >
-                                <Dumbbell size={20} />
+                                <Dumbbell size={20} className="fill-black text-black" />
                                 Buff Cards
                             </motion.button>
                             <motion.button
