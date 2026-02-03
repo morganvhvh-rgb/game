@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake, TrendingUp } from 'lucide-react';
+import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake, TrendingUp, Dumbbell } from 'lucide-react';
 import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS, S_TIER_BUFFS } from './data/gameConfig';
 import PlayingCard from './components/PlayingCard';
 import DealOption from './components/DealOption';
@@ -181,7 +181,7 @@ const App = () => {
         setFloatingWins(prev => [...prev, { id, val, cellIndex }]);
         setTimeout(() => {
             setFloatingWins(prev => prev.filter(w => w.id !== id));
-        }, 1500);
+        }, 800);
     };
 
     const calculateResults = (newGrid, currentJuiceInPlay, currentBuffs, currentInvCount) => {
@@ -365,9 +365,9 @@ const App = () => {
                             if (prev === 0) setLockedSymbol(null);
                             return prev;
                         });
-                    }, 600);
+                    }, 250);
                 }
-            }, i * 400);
+            }, i * 150);
         });
     };
 
@@ -439,9 +439,18 @@ const App = () => {
                                                 {isRevealed || (isTopLeft && lockedSymbol && isSpinning) ? (
                                                     <motion.div
                                                         key={`${idx}-${displaySymbol}`}
-                                                        initial={isTopLeft && lockedSymbol ? { x: 0, opacity: 1, scale: 1 } : { x: -100, opacity: 0, scale: 0.8 }}
-                                                        animate={{ x: 0, opacity: 1, scale: isWinning ? [1, 1.15, 1] : 1, rotate: isWinning ? [0, -3, 3, 0] : 0 }}
-                                                        transition={{ type: "spring", stiffness: 260, damping: 20, delay: isWinning ? 0 : (Math.floor(idx / 3) * 0.1) }}
+                                                        initial={isTopLeft && lockedSymbol ? { x: 0, opacity: 1, scale: 1 } : { x: -50, opacity: 0, scale: 0.5 }}
+                                                        animate={{
+                                                            x: 0,
+                                                            opacity: 1,
+                                                            scale: isWinning ? [1, 1.5, 1] : 1,
+                                                            rotate: isWinning ? [0, -5, 5, 0] : 0
+                                                        }}
+                                                        transition={{
+                                                            default: { type: "spring", stiffness: 400, damping: 25 },
+                                                            scale: { duration: 0.4, times: [0, 0.5, 1], repeat: 0 },
+                                                            delay: isWinning ? 0 : (Math.floor(idx / 3) * 0.05)
+                                                        }}
                                                         className={`text-5xl sm:text-6xl z-10 ${isWinning ? 'drop-shadow-lg' : ''} relative`}
                                                     >
                                                         {displaySymbol}
@@ -474,8 +483,12 @@ const App = () => {
                                             {isWinning && (
                                                 <motion.div
                                                     initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    className={`absolute inset-0 border-2 rounded-[1.5rem] z-0 ${grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB ? 'bg-red-400/40 border-red-400/50' : 'bg-amber-400/40 border-amber-400/50'}`}
+                                                    animate={{ opacity: [0, 0.8, 0] }}
+                                                    transition={{ duration: 2, times: [0, 0.1, 1], ease: "easeOut" }}
+                                                    className={`absolute inset-0 rounded-[1.5rem] z-0 ${grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB
+                                                        ? 'bg-red-500'
+                                                        : 'bg-pink-500'
+                                                        }`}
                                                 />
                                             )}
                                         </div>
@@ -491,11 +504,12 @@ const App = () => {
                                         initial={{ opacity: 0, y: 0, scale: 0.5 }}
                                         animate={{ opacity: 1, y: -40, scale: 1.0 }}
                                         exit={{ opacity: 0 }}
-                                        transition={{ duration: 1.5, ease: "backOut" }}
-                                        className={`absolute z-50 pointer-events-none font-black drop-shadow-sm text-2xl ${win.val < 0 ? 'text-red-500' : 'text-green-600'}`}
+                                        transition={{ duration: 0.6, ease: "backOut" }}
+                                        className="absolute z-50 pointer-events-none font-black text-2xl text-white"
                                         style={{
                                             left: `${(win.cellIndex % 3) * 33 + 16}%`,
-                                            top: `${Math.floor(win.cellIndex / 3) * 33 + 16}%`
+                                            top: `${Math.floor(win.cellIndex / 3) * 33 + 16}%`,
+                                            textShadow: '3px 3px 0 #000'
                                         }}
                                     >
                                         {win.val > 0 ? `+${win.val}` : win.val}
@@ -531,8 +545,8 @@ const App = () => {
                                 disabled={isSpinning}
                                 className="w-full py-4 rounded-[1.5rem] bg-white text-stone-900 font-bold border-2 border-stone-100 hover:border-amber-200 transition-colors flex items-center justify-center gap-2"
                             >
-                                <Store size={20} />
-                                Buff Marketplace
+                                <Dumbbell size={20} />
+                                Buff Cards
                             </motion.button>
                             <motion.button
                                 whileHover={{ scale: 1.01 }}
