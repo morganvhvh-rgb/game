@@ -4,7 +4,7 @@ import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, H
 import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS, S_TIER_BUFFS } from './data/gameConfig';
 import PlayingCard from './components/PlayingCard';
 import DealOption from './components/DealOption';
-import LegendItem from './components/LegendItem';
+
 
 // Configuration
 // Configuration loaded from gameConfig.js
@@ -699,31 +699,163 @@ const App = () => {
                         key="info"
                         initial={{ opacity: 1 }}
                         exit={{ opacity: 0, y: 20 }}
-                        className="w-full flex flex-col items-center max-w-md"
+                        className="w-full flex flex-col items-center max-w-md h-[calc(100vh-100px)]"
                     >
-                        {/* Info Header */}
-                        <div className="w-full mb-6">
+                        {/* Compact Header */}
+                        <div className="w-full mb-3 flex justify-between items-center sticky top-2 z-50">
                             <button
                                 onClick={() => setView('game')}
-                                className="flex items-center gap-2 text-stone-500 hover:text-stone-900 font-bold transition-colors mb-4"
+                                className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm text-stone-900 hover:bg-white font-black transition-all border border-stone-200 text-sm"
                             >
-                                <ArrowLeft size={18} />
-                                Back to Game
+                                <ArrowLeft size={16} />
+                                Back
                             </button>
+                            <span className="text-xs font-black uppercase tracking-widest text-stone-400 bg-white/90 px-3 py-1.5 rounded-full border border-stone-200">
+                                Guide
+                            </span>
+                        </div>
 
-                            <div className="bg-white rounded-[2.5rem] border border-stone-200 p-6 shadow-sm mb-12 w-full">
-                                <div className="flex items-center gap-2 mb-6 border-b border-stone-100 pb-4">
-                                    <HelpCircle size={18} className="text-stone-400" />
-                                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-stone-400">Information</h2>
+                        <div className="w-full flex-1 overflow-y-auto min-h-0 space-y-3 pb-4">
+
+                            {/* Combined Grid for Paytable */}
+                            <div className="grid grid-cols-2 gap-2">
+                                {/* Diamond - Jackpot - Full Width */}
+                                <div className="col-span-2 flex items-center gap-3 bg-white p-3 rounded-2xl border border-stone-200 shadow-sm relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-cyan-50/50 z-0"></div>
+                                    <div className="text-4xl shadow-sm bg-white w-12 h-12 rounded-xl flex items-center justify-center relative z-10">💎</div>
+                                    <div className="flex-1 relative z-10">
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="font-black text-stone-900 uppercase text-sm">Jackpot</h4>
+                                            <span className="text-[10px] font-bold bg-cyan-100 text-cyan-600 px-1.5 py-0.5 rounded-full">RARE</span>
+                                        </div>
+                                        <p className="text-[10px] text-stone-500 font-medium leading-tight">Match 3 Diamonds.</p>
+                                    </div>
+                                    <div className="flex flex-col items-end relative z-10">
+                                        <span className="font-black text-lg text-cyan-600">+100</span>
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-1 gap-y-8">
-                                    <LegendItem symbol="🍇" label="Fruits" payout="10" prob="70%" desc="Standard 3-in-a-row fruit match." />
-                                    <LegendItem symbol="💣" label="Bomb" payout="-50" prob="20%" desc="Avoid aligning 3 bombs!" isPenalty={true} />
-                                    <LegendItem symbol="💎" label="Diamond" payout="100" prob="3%" desc="The rare jackpot symbol." />
-                                    <LegendItem symbol="🍬" label="Candy" payout="Match" prob="4%" desc="Wild symbol. 1 per spin." />
-                                    <LegendItem symbol="💰" label="Money" payout="10/bag" prob="6%" desc="Pays instantly on appearance." />
+
+                                {/* Fruits */}
+                                <div className="col-span-2 flex items-center gap-3 bg-white p-2.5 rounded-2xl border border-stone-200 shadow-sm">
+                                    <div className="flex -space-x-2 shrink-0 pl-1">
+                                        {SYMBOLS.FRUIT.map((f, i) => (
+                                            <div key={i} className="w-8 h-8 bg-stone-50 rounded-full flex items-center justify-center text-lg shadow-sm border border-stone-100 relative z-[10] first:z-[40] second:z-[30]">{f}</div>
+                                        ))}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-stone-900 text-xs">Fruit Match</h4>
+                                        <p className="text-[10px] text-stone-400">Match 3</p>
+                                    </div>
+                                    <div className="font-black text-stone-900 text-base pr-2">+10</div>
+                                </div>
+
+                                {/* Bomb */}
+                                <div className="col-span-2 flex items-center gap-3 bg-red-50/50 p-2.5 rounded-2xl border border-red-100 shadow-sm">
+                                    <div className="text-2xl w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm">💣</div>
+                                    <div className="flex-1">
+                                        <h4 className="font-black text-red-900 uppercase text-xs">Penalty</h4>
+                                        <p className="text-[10px] text-red-700/70 font-medium">Minus points</p>
+                                    </div>
+                                    <div className="font-black text-red-500 text-base pr-2">-50</div>
+                                </div>
+
+                                {/* Wild */}
+                                <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
+                                    <div className="text-2xl mb-1">🍬</div>
+                                    <div className="font-bold text-[10px] uppercase text-stone-900">Wild</div>
+                                    <p className="text-[9px] text-stone-400 leading-tight">Max 1/spin</p>
+                                </div>
+
+                                {/* Scatter */}
+                                <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
+                                    <div className="text-2xl mb-1">💰</div>
+                                    <div className="font-bold text-[10px] uppercase text-stone-900">Scatter</div>
+                                    <p className="text-[9px] text-stone-400 leading-tight">Instant +10</p>
                                 </div>
                             </div>
+
+                            {/* Mechanics - Compact Dark Mode */}
+                            <div className="bg-stone-900 text-stone-300 rounded-2xl p-4 shadow-lg relative overflow-hidden">
+                                <div className="grid grid-cols-1 gap-4 relative z-10">
+                                    {/* Locking */}
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                            <Lock size={14} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <h4 className="font-bold text-white text-xs mb-1">Symbol Locking</h4>
+                                                <span className="text-[10px] font-black text-amber-400 bg-amber-900/30 px-1.5 rounded">{LOCK_COST}C</span>
+                                            </div>
+                                            <p className="text-[10px] text-stone-400 leading-relaxed">
+                                                Top-Left symbol stays for {LOCK_DURATION} spins.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-px bg-stone-800 w-full"></div>
+
+                                    {/* Spinflation */}
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                                            <TrendingUp size={14} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white text-xs mb-1">Spinflation</h4>
+                                            <p className="text-[10px] text-stone-400 leading-relaxed">
+                                                Spin cost doubles every 20 spins.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Section: Mechanics (Old) - To Delete */}
+                            <div className="hidden">
+                                <div className="absolute -right-4 -top-4 text-stone-800 opacity-20 rotate-12">
+                                    <Zap size={150} />
+                                </div>
+
+                                <h3 className="text-sm font-black uppercase tracking-widest text-white mb-6 flex items-center gap-2 relative z-10">
+                                    <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    Mechanics
+                                </h3>
+
+                                <div className="space-y-6 relative z-10">
+
+                                    {/* Locking */}
+                                    <div className="flex gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                            <Lock size={20} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white mb-1">Symbol Locking</h4>
+                                            <p className="text-xs text-stone-400 leading-relaxed mb-2">
+                                                Click the <strong className="text-white">Top-Left</strong> symbol to lock it for {LOCK_DURATION} spins.
+                                            </p>
+                                            <div className="inline-flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700">
+                                                <span className="text-[10px] font-bold text-stone-500 uppercase">Cost</span>
+                                                <span className="font-black text-amber-400 text-sm">{LOCK_COST}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Spinflation */}
+                                    <div className="flex gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                                            <TrendingUp size={20} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white mb-1">Spinflation</h4>
+                                            <p className="text-xs text-stone-400 leading-relaxed">
+                                                Spin costs double every 20 spins. Manage your balance wisely!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </motion.div>
                 )}
