@@ -12,7 +12,7 @@ const DealOption = ({ title, desc, cost, count, onClick, disabled, icon }) => (
         `}
     >
         {/* Icon */}
-        <div className="mb-2 sm:mb-4 p-2 sm:p-3 bg-stone-50 rounded-full shadow-inner mt-2 transform scale-125">
+        <div className="mb-2 sm:mb-4 mt-2 transform scale-150 origin-center">
             {icon}
         </div>
 

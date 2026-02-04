@@ -20,7 +20,8 @@ const GameView = ({
     balance,
     spinCost,
     enterShop,
-    setView
+    setView,
+    gridBuffs
 }) => {
     return (
         <motion.div
@@ -49,7 +50,8 @@ const GameView = ({
                                 key={idx}
                                 onClick={isTopLeft ? toggleLock : undefined}
                                 className={`
-                                    relative bg-white rounded-[1.5rem] flex items-center justify-center overflow-hidden shadow-sm border border-stone-50
+                                    relative bg-white rounded-[1.5rem] flex items-center justify-center overflow-hidden shadow-sm border
+                                    ${idx === 8 && gridBuffs?.lastPeach ? 'border-orange-400 border-2' : 'border-stone-50'}
                                     ${isTopLeft ? 'cursor-pointer hover:brightness-95 transition-all' : ''}
                                 `}
                             >
@@ -93,7 +95,7 @@ const GameView = ({
                                 {isTopLeft && (
                                     <div className="absolute top-3 right-3 z-20">
                                         {lockedSymbol ? (
-                                            <Lock size={22} className="text-amber-500 fill-amber-500" />
+                                            <Lock size={22} className="text-amber-500" />
                                         ) : (
                                             <Unlock size={18} className="text-stone-200" />
                                         )}

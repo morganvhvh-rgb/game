@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Handshake, Zap, Sparkles, Star, Coins, Axis3d, Square } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Handshake, Zap, Sparkles, Star, Coins, Axis3d, Square, Lock } from 'lucide-react';
 import DealOption from './DealOption';
 import PlayingCard from './PlayingCard';
 
@@ -17,7 +17,8 @@ const ShopView = ({
     purchaseCard,
     balance,
     gridBuffs,
-    purchaseGridBuff
+    purchaseGridBuff,
+    unlockedItems = [] // Default to empty array if not passed
 }) => {
     return (
         <motion.div
@@ -96,9 +97,7 @@ const ShopView = ({
                             `}
                         >
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-stone-800 rounded-xl border border-stone-700">
-                                    <Star size={24} className="text-yellow-400 animate-pulse" />
-                                </div>
+                                <Star size={32} className="text-yellow-400 animate-pulse" />
                                 <div className="text-left">
                                     <h3 className="font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
                                         Lottery Chance
@@ -114,73 +113,87 @@ const ShopView = ({
                             </div>
                         </button>
 
-                        {/* Grid Buff Placeholders -> Implemented */}
-                        <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4">
-                            {/* Slant Buff */}
-                            <button
-                                onClick={() => purchaseGridBuff('slant')}
-                                disabled={gridBuffs.slant || balance < 50}
-                                className={`
-                                    flex-1 p-4 rounded-[1.5rem] border-2 flex flex-col items-center justify-center text-center transition-all relative overflow-hidden
-                                    ${gridBuffs.slant
-                                        ? 'bg-red-50 border-red-200 opacity-60'
-                                        : balance < 50
-                                            ? 'bg-stone-100 border-stone-200 opacity-50 cursor-not-allowed'
-                                            : 'bg-white border-red-200 shadow-lg hover:scale-105 hover:shadow-red-200/50 cursor-pointer'
-                                    }
-                                `}
-                            >
-                                {gridBuffs.slant && (
-                                    <div className="absolute top-2 right-2 text-xs font-black bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-                                        OWNED
-                                    </div>
-                                )}
-                                <div className={`mb-2 p-2 rounded-xl ${gridBuffs.slant ? 'bg-red-100 text-red-400' : 'bg-red-50 text-red-500'}`}>
-                                    <Axis3d size={24} />
-                                </div>
-                                <span className="font-bold text-stone-900 text-sm uppercase mb-1">Slant</span>
-                                <div className="text-xs text-stone-500 font-medium leading-tight mb-3">
-                                    Symbols match diagonally.
-                                </div>
-                                {!gridBuffs.slant && (
-                                    <div className="flex items-center gap-1 font-black text-sm text-stone-900 bg-stone-100 px-3 py-1 rounded-full">
-                                        50 <Coins size={12} className="text-amber-400 fill-amber-400" />
-                                    </div>
-                                )}
-                            </button>
-
+                        {/* Grid Buff Placeholders */}
+                        <div className="w-full flex flex-row items-stretch justify-center gap-2">
                             {/* Last Peach Buff */}
-                            <button
-                                onClick={() => purchaseGridBuff('lastPeach')}
-                                disabled={gridBuffs.lastPeach || balance < 100}
-                                className={`
-                                    flex-1 p-4 rounded-[1.5rem] border-2 flex flex-col items-center justify-center text-center transition-all relative overflow-hidden
-                                    ${gridBuffs.lastPeach
-                                        ? 'bg-orange-50 border-orange-200 opacity-60'
-                                        : balance < 100
-                                            ? 'bg-stone-100 border-stone-200 opacity-50 cursor-not-allowed'
-                                            : 'bg-white border-orange-200 shadow-lg hover:scale-105 hover:shadow-orange-200/50 cursor-pointer'
-                                    }
-                                `}
-                            >
-                                {gridBuffs.lastPeach && (
-                                    <div className="absolute top-2 right-2 text-xs font-black bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
-                                        OWNED
+                            {unlockedItems.includes('lastPeach') ? (
+                                <button
+                                    onClick={() => purchaseGridBuff('lastPeach')}
+                                    disabled={gridBuffs.lastPeach || balance < 50}
+                                    className={`
+                                        flex-1 px-2 py-3 rounded-2xl border-b-4 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
+                                        ${gridBuffs.lastPeach
+                                            ? 'bg-stone-100 border-stone-200 opacity-60'
+                                            : `bg-orange-400 border-orange-600 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-lg hover:brightness-110 cursor-pointer'}`
+                                        }
+                                    `}
+                                >
+                                    <div className={`mb-2 ${gridBuffs.lastPeach ? 'text-stone-400' : 'text-white'}`}>
+                                        <Square size={28} />
                                     </div>
-                                )}
-                                <div className={`mb-2 p-2 rounded-xl ${gridBuffs.lastPeach ? 'bg-orange-100 text-orange-400' : 'bg-orange-50 text-orange-500'}`}>
-                                    <Square size={24} />
-                                </div>
-                                <span className="font-bold text-stone-900 text-sm uppercase mb-1">Last Peach</span>
-                                <div className="text-xs text-stone-500 font-medium leading-tight mb-3">
-                                    Peach in last square = 2x Total Win.
-                                </div>
-                                {!gridBuffs.lastPeach && (
-                                    <div className="flex items-center gap-1 font-black text-sm text-stone-900 bg-stone-100 px-3 py-1 rounded-full">
-                                        100 <Coins size={12} className="text-amber-400 fill-amber-400" />
+                                    <span className={`font-black text-xs uppercase mb-1 leading-tight ${gridBuffs.lastPeach ? 'text-stone-500' : 'text-white'}`}>Last Peach</span>
+                                    <div className={`text-[10px] font-bold leading-tight mb-2 h-8 flex items-center justify-center ${gridBuffs.lastPeach ? 'text-stone-400' : 'text-white/90'}`}>
+                                        Peach in last square = 2x win.
                                     </div>
-                                )}
-                            </button>
+                                    {gridBuffs.lastPeach ? (
+                                        <div className="mt-auto text-[10px] font-black bg-stone-200 text-stone-500 px-2 py-0.5 rounded-full">OWNED</div>
+                                    ) : (
+                                        <div className={`mt-auto flex items-center gap-1 font-black text-xs px-3 py-1 rounded-full ${balance >= 50 ? 'bg-white text-orange-600' : 'bg-black/20 text-white'}`}>
+                                            50 <Coins size={10} className={balance >= 50 ? "text-orange-500 fill-orange-500 ml-0.5" : "text-white fill-white ml-0.5"} />
+                                        </div>
+                                    )}
+                                </button>
+                            ) : (
+                                <div className="flex-1 px-2 py-3 rounded-2xl border-2 border-stone-200 bg-stone-100 flex flex-col items-center justify-center text-center opacity-50 relative overflow-hidden">
+                                    <div className="text-stone-300 mb-2">
+                                        <Lock size={28} />
+                                    </div>
+                                    <span className="font-black text-xs uppercase text-stone-400 mb-1">Locked</span>
+                                    <div className="text-[10px] items-center justify-center text-stone-400 font-bold leading-tight">
+                                        Reach Spinflation 64
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Slant Buff */}
+                            {unlockedItems.includes('slant') ? (
+                                <button
+                                    onClick={() => purchaseGridBuff('slant')}
+                                    disabled={gridBuffs.slant || balance < 50}
+                                    className={`
+                                        flex-1 px-2 py-3 rounded-2xl border-b-4 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
+                                        ${gridBuffs.slant
+                                            ? 'bg-stone-100 border-stone-200 opacity-60'
+                                            : `bg-red-500 border-red-700 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-lg hover:brightness-110 cursor-pointer'}`
+                                        }
+                                    `}
+                                >
+                                    <div className={`mb-2 ${gridBuffs.slant ? 'text-stone-400' : 'text-white'}`}>
+                                        <Axis3d size={28} />
+                                    </div>
+                                    <span className={`font-black text-xs uppercase mb-1 leading-tight ${gridBuffs.slant ? 'text-stone-500' : 'text-white'}`}>Slant</span>
+                                    <div className={`text-[10px] font-bold leading-tight mb-2 h-8 flex items-center justify-center ${gridBuffs.slant ? 'text-stone-400' : 'text-white/90'}`}>
+                                        Symbols match diagonally.
+                                    </div>
+                                    {gridBuffs.slant ? (
+                                        <div className="mt-auto text-[10px] font-black bg-stone-200 text-stone-500 px-2 py-0.5 rounded-full">OWNED</div>
+                                    ) : (
+                                        <div className={`mt-auto flex items-center gap-1 font-black text-xs px-3 py-1 rounded-full ${balance >= 50 ? 'bg-white text-red-600' : 'bg-black/20 text-white'}`}>
+                                            50 <Coins size={10} className={balance >= 50 ? "text-red-500 fill-red-500 ml-0.5" : "text-white fill-white ml-0.5"} />
+                                        </div>
+                                    )}
+                                </button>
+                            ) : (
+                                <div className="flex-1 px-2 py-3 rounded-2xl border-2 border-stone-200 bg-stone-100 flex flex-col items-center justify-center text-center opacity-50 relative overflow-hidden">
+                                    <div className="text-stone-300 mb-2">
+                                        <Lock size={28} />
+                                    </div>
+                                    <span className="font-black text-xs uppercase text-stone-400 mb-1">Locked</span>
+                                    <div className="text-[10px] items-center justify-center text-stone-400 font-bold leading-tight">
+                                        Reach Spinflation 128
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 ) : (

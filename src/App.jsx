@@ -1,528 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Coins, ShoppingCart, Zap, LayoutGrid, Info, HelpCircle, Lock, Unlock, Hammer, ArrowLeft, Store, Sparkles, Star, Handshake, TrendingUp, Dumbbell } from 'lucide-react';
-import { SYMBOLS, LOCK_COST, LOCK_DURATION, BUFF_DEFINITIONS, S_TIER_BUFFS } from './data/gameConfig';
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { TrendingUp, Unlock } from 'lucide-react';
+import { BUFF_DEFINITIONS } from './data/gameConfig';
 import GameView from './components/GameView';
 import ShopView from './components/ShopView';
-
-
-// Configuration
-// Configuration loaded from gameConfig.js
+import InfoView from './components/InfoView';
+import Header from './components/Header';
+import { useGameLogic } from './hooks/useGameLogic';
 
 const App = () => {
-    const [balance, setBalance] = useState(150);
-    const [spinCost, setSpinCost] = useState(1);
-    const [totalSpins, setTotalSpins] = useState(0);
-    const [nextSpinflationThreshold, setNextSpinflationThreshold] = useState(20);
-    const [showSpinflation, setShowSpinflation] = useState(false);
-    const [view, setView] = useState('game'); // 'game' | 'shop' | 'info'
-    const [grid, setGrid] = useState([
-        ['🍒', '🍇', '🍌'],
-        ['💎', '🍬', '💰'],
-        ['🍑', '🍒', '🍇']
-    ]);
-    const [isSpinning, setIsSpinning] = useState(false);
-    const [lastWin, setLastWin] = useState(0);
-    const [revealingColumn, setRevealingColumn] = useState(-1);
-    const [winningCells, setWinningCells] = useState([]);
-    const [floatingWins, setFloatingWins] = useState([]);
+    const {
+        balance,
+        displayBalance,
+        spinCost,
+        showSpinflation,
+        setShowSpinflation,
+        view,
+        setView,
+        gameOver,
+        unlockedItems,
+        newUnlocks,
+        grid,
+        isSpinning,
+        lastWin,
+        revealingColumn,
+        winningCells,
+        floatingWins,
+        lockedSymbol,
+        lockSpinsRemaining,
+        miningTurns,
+        buffs,
+        activeBuffsInPlay,
+        juiceBoxInPlay,
+        activeInvestorCount,
+        activeMiningTurns,
+        shopPhase,
+        setShopPhase,
+        dealtCards,
+        lotteryFail,
+        gridBuffs,
+        resetGame,
+        enterShop,
+        handleDeal,
+        handleLottery,
+        purchaseCard,
+        purchaseGridBuff,
+        toggleLock,
+        handleSpin,
+        activeBuffList,
+    } = useGameLogic();
 
-    // Animated Balance
-    const balanceMotion = useMotionValue(balance);
-    const displayBalance = useTransform(balanceMotion, (value) => Math.round(value));
-
-    useEffect(() => {
-        const controls = animate(balanceMotion, balance, { duration: 1, ease: "circOut" });
-        return controls.stop;
-    }, [balance]);
-
-    const [lockedSymbol, setLockedSymbol] = useState(null);
-    const [lockSpinsRemaining, setLockSpinsRemaining] = useState(0);
-    const [miningTurns, setMiningTurns] = useState(0);
-
-    const [hasUsedLock, setHasUsedLock] = useState(false);
-
-    // Buff State
-    const [buffs, setBuffs] = useState({
-        juiceBox: false,
-        grapeLove: false,
-        halloween: false,
-        investor: false,
-        mining: false,
-        orangutan: false,
-        angel: false,
-        devil: false
-    });
-
-    const [activeBuffsInPlay, setActiveBuffsInPlay] = useState({ ...buffs });
-    const [juiceBoxActiveNext, setJuiceBoxActiveNext] = useState(false);
-    const [juiceBoxInPlay, setJuiceBoxInPlay] = useState(false);
-    const [investorCount, setInvestorCount] = useState(0);
-    const [activeInvestorCount, setActiveInvestorCount] = useState(0);
-    const [activeMiningTurns, setActiveMiningTurns] = useState(0);
-
-    // Shop State
-    const [shopPhase, setShopPhase] = useState('menu'); // 'menu' | 'reveal'
-    const [dealtCards, setDealtCards] = useState([]);
-    const [lotteryFail, setLotteryFail] = useState(false);
-
-    const enterShop = () => {
-        setShopPhase('menu');
-        setLotteryFail(false);
-        setView('shop');
+    // Format unlock names for display
+    const formatUnlockName = (id) => {
+        if (id === 'lastPeach') return 'Last Peach';
+        if (id === 'slant') return 'Slant';
+        return id;
     };
-
-    const handleDeal = (dealType) => {
-        let cost = 0;
-        let count = 0;
-        let pricingStrategy = '';
-
-        if (dealType === 'fair') { cost = 10; count = 2; pricingStrategy = 'fair'; }
-        if (dealType === 'volatile') { cost = 20; count = 3; pricingStrategy = 'volatile'; }
-        if (dealType === 'great') { cost = 30; count = 1; pricingStrategy = 'great'; }
-
-        if (balance < cost) return;
-
-        setBalance(prev => prev - cost);
-
-        // Logic to pick 'count' unique buffs
-        const shuffledBuffs = [...BUFF_DEFINITIONS].sort(() => 0.5 - Math.random());
-        const selected = shuffledBuffs.slice(0, count);
-
-        // Volatile Prices Pool
-        const volatilePrices = [25, 40, 55].sort(() => 0.5 - Math.random());
-
-        const cards = selected.map((buff, index) => {
-            let price = 40; // Default Base
-            if (pricingStrategy === 'fair') price = 40;
-            if (pricingStrategy === 'great') price = 10;
-            if (pricingStrategy === 'volatile') price = volatilePrices[index];
-
-            return { ...buff, price };
-        });
-
-        setDealtCards(cards);
-        setLotteryFail(false);
-        setShopPhase('reveal');
-    };
-
-    const handleLottery = () => {
-        const cost = 50;
-        if (balance < cost) return;
-
-        setBalance(prev => prev - cost);
-
-        const isWin = Math.random() < 0.2;
-
-        if (isWin) {
-            const randomSTier = S_TIER_BUFFS[Math.floor(Math.random() * S_TIER_BUFFS.length)];
-            // Price is 200 for S-Tier Buffs -> Now reduced/free? Logic says "buying one". 
-            // Let's keep the price or reduce it? User didn't specify S-Tier card price, just lottery ticket. 
-            // Assuming 200 is fine as it's S-Tier.
-            setDealtCards([{ ...randomSTier, price: 200 }]);
-            setLotteryFail(false);
-        } else {
-            setDealtCards([]);
-            setLotteryFail(true);
-        }
-        setShopPhase('reveal');
-    };
-
-    const purchaseCard = (card) => {
-        if (balance >= card.price) {
-            // Check if already owned (skip if so, but allow swapping S-tiers)
-            if (buffs[card.id]) return;
-
-            setBalance(prev => prev - card.price);
-
-            setBuffs(prev => {
-                const newBuffs = { ...prev, [card.id]: true };
-                // Enforce Exclusivity
-                if (card.id === 'angel') newBuffs.devil = false;
-                if (card.id === 'devil') newBuffs.angel = false;
-                return newBuffs;
-            });
-
-            if (card.id === 'investor') {
-                setInvestorCount(0);
-            }
-            // Return to game after purchase
-            setView('game');
-        }
-    };
-
-    // Grid Buff Logic
-    const [gridBuffs, setGridBuffs] = useState({
-        slant: false,
-        lastPeach: false
-    });
-
-    const purchaseGridBuff = (type) => {
-        let cost = 0;
-        if (type === 'slant') cost = 50;
-        if (type === 'lastPeach') cost = 100;
-
-        if (balance >= cost && !gridBuffs[type]) {
-            setBalance(prev => prev - cost);
-            setGridBuffs(prev => ({ ...prev, [type]: true }));
-        }
-    };
-
-    const toggleLock = () => {
-        if (isSpinning) return;
-
-        if (lockedSymbol) {
-            setLockedSymbol(null);
-            setLockSpinsRemaining(0);
-        } else {
-            // Free, Single Use
-            if (!hasUsedLock) {
-                const currentTopLeft = grid[0][0];
-                setLockedSymbol(currentTopLeft);
-                setLockSpinsRemaining(LOCK_DURATION);
-                setHasUsedLock(true);
-            }
-        }
-    };
-
-    const getRandomSymbol = (existingInSpin, isMiningActive) => {
-        const pool = [];
-
-        if (isMiningActive) {
-            // Mining Active: Massive influx of diamonds
-            SYMBOLS.FRUIT.forEach(f => { for (let i = 0; i < 5; i++) pool.push(f); }); // Reduced fruit
-            for (let i = 0; i < 5; i++) pool.push(SYMBOLS.BOMB); // Reduced bombs
-            for (let i = 0; i < 60; i++) pool.push(SYMBOLS.DIAMOND); // Massive diamonds
-            for (let i = 0; i < 4; i++) pool.push(SYMBOLS.MONEY);
-        } else {
-            // Standard Pool
-            SYMBOLS.FRUIT.forEach(f => { for (let i = 0; i < 12; i++) pool.push(f); });
-
-            let bombCount = 10;
-            if (buffs.devil) bombCount *= 2;
-            if (buffs.angel) bombCount = 0;
-
-            for (let i = 0; i < bombCount; i++) pool.push(SYMBOLS.BOMB);
-            for (let i = 0; i < 2; i++) pool.push(SYMBOLS.DIAMOND);
-            for (let i = 0; i < 4; i++) pool.push(SYMBOLS.MONEY);
-        }
-
-        const candyCount = existingInSpin.filter(s => s === SYMBOLS.CANDY).length;
-        if (buffs.halloween || candyCount === 0) {
-            for (let i = 0; i < 3; i++) pool.push(SYMBOLS.CANDY);
-        }
-        return pool[Math.floor(Math.random() * pool.length)];
-    };
-
-    const addFloatingWin = (val, cellIndex) => {
-        const id = Math.random();
-        setFloatingWins(prev => [...prev, { id, val, cellIndex }]);
-        setTimeout(() => {
-            setFloatingWins(prev => prev.filter(w => w.id !== id));
-        }, 800);
-    };
-
-    const calculateResults = (newGrid, currentJuiceInPlay, currentBuffs, currentInvCount) => {
-        let totalWin = 0;
-        let fruitWinOccurred = false;
-        let bombMatchOccurred = false;
-        let winningIndices = [];
-
-        // 1. Horizontal Checks
-        newGrid.forEach((row, rowIndex) => {
-            const nonCandy = row.find(s => s !== SYMBOLS.CANDY);
-            if (!nonCandy) {
-                // All Candies - Jackpot
-                totalWin += 100;
-                winningIndices.push(rowIndex * 3, rowIndex * 3 + 1, rowIndex * 3 + 2);
-                addFloatingWin(100, rowIndex * 3 + 1);
-            } else {
-                const isMatch = row.every(s => {
-                    if (s === nonCandy) return true;
-                    if (s === SYMBOLS.CANDY) {
-                        if (currentBuffs.halloween && nonCandy === SYMBOLS.BOMB) return false;
-                        return true;
-                    }
-                    return false;
-                });
-
-                if (isMatch) {
-                    let rowWin = 0;
-                    if (SYMBOLS.FRUIT.includes(nonCandy)) {
-                        let multiplier = 1;
-                        if (currentJuiceInPlay) multiplier *= 4;
-                        if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
-                        if (currentBuffs.devil && nonCandy === '🍇') multiplier *= 2;
-                        if (currentBuffs.angel && nonCandy === '🍒') multiplier *= 5;
-                        if (currentBuffs.orangutan && nonCandy === '🍌') multiplier *= 2;
-                        rowWin = 10 * multiplier;
-                        fruitWinOccurred = true;
-                    } else if (nonCandy === SYMBOLS.DIAMOND) {
-                        rowWin = 100;
-                    } else if (nonCandy === SYMBOLS.BOMB) {
-                        rowWin = -50;
-                        bombMatchOccurred = true;
-                    }
-
-                    if (rowWin !== 0) {
-                        totalWin += rowWin;
-                        winningIndices.push(rowIndex * 3, rowIndex * 3 + 1, rowIndex * 3 + 2);
-                        addFloatingWin(rowWin, rowIndex * 3 + 1);
-                    }
-                }
-            }
-        });
-
-        // 1.5 Diagonal Checks (Slant Buff)
-        if (gridBuffs.slant) {
-            const diagonals = [
-                [0, 4, 8], // Top-Left to Bottom-Right
-                [2, 4, 6]  // Top-Right to Bottom-Left
-            ];
-
-            diagonals.forEach(indices => {
-                const diagSymbols = indices.map(i => newGrid[Math.floor(i / 3)][i % 3]);
-                const nonCandy = diagSymbols.find(s => s !== SYMBOLS.CANDY);
-
-                if (!nonCandy) {
-                    // All Candies Diagonally - Bonus? Let's treat as normal win for now.
-                    // Or maybe Wilds don't pay out on their own unless it's a specific wild mechanic.
-                    // Existing logic for rows handles "All Candies" as Jackpot check separately? 
-                    // No, "All Candies" check in rows assumes jackpot.
-                    // Let's stick to standard matching logic.
-                    // If all candies, it matches "nonCandy" which is undefined... wait.
-                    // Logic above: `if (!nonCandy)` -> All Candies.
-                    // If diagonal is all candies, let's just award a basic fruit win or something? 
-                    // Or just ignore "All Wilds" special case for diagonals to keep it simple unless specified.
-                    // Actually, if !nonCandy, it means 3 Wilds. 
-                    // Let's treat 3 Wilds as a "Cherry" match for simplicity if not specified, or just skip.
-                    // Re-reading row logic: if (!nonCandy) { totalWin += 100; ... } -> Jackpot.
-                    // Diagonal Jackpot? Why not.
-                    totalWin += 100;
-                    winningIndices.push(...indices);
-                    addFloatingWin(100, indices[1]);
-                } else {
-                    const isMatch = diagSymbols.every(s => {
-                        if (s === nonCandy) return true;
-                        if (s === SYMBOLS.CANDY) {
-                            if (currentBuffs.halloween && nonCandy === SYMBOLS.BOMB) return false;
-                            return true;
-                        }
-                        return false;
-                    });
-
-                    if (isMatch) {
-                        let diagWin = 0;
-                        if (SYMBOLS.FRUIT.includes(nonCandy)) {
-                            let multiplier = 1;
-                            if (currentJuiceInPlay) multiplier *= 4;
-                            if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
-                            // Other fruit multipliers apply too
-                            if (currentBuffs.devil && nonCandy === '🍇') multiplier *= 2;
-                            if (currentBuffs.angel && nonCandy === '🍒') multiplier *= 5;
-                            if (currentBuffs.orangutan && nonCandy === '🍌') multiplier *= 2;
-
-                            diagWin = 10 * multiplier;
-                            fruitWinOccurred = true;
-                        } else if (nonCandy === SYMBOLS.DIAMOND) {
-                            diagWin = 100;
-                        } else if (nonCandy === SYMBOLS.BOMB) {
-                            diagWin = -50;
-                            bombMatchOccurred = true;
-                        }
-
-                        if (diagWin !== 0) {
-                            totalWin += diagWin;
-                            winningIndices.push(...indices);
-                            addFloatingWin(diagWin, indices[1]);
-                        }
-                    }
-                }
-            });
-        }
-
-        // 2. Vertical Checks (Orangutan Buff)
-        if (currentBuffs.orangutan) {
-            for (let col = 0; col < 3; col++) {
-                const colSymbols = [newGrid[0][col], newGrid[1][col], newGrid[2][col]];
-                const nonCandy = colSymbols.find(s => s !== SYMBOLS.CANDY);
-                const isBananaMatchTarget = !nonCandy || nonCandy === '🍌';
-
-                if (isBananaMatchTarget) {
-                    const isMatch = colSymbols.every(s => s === '🍌' || s === SYMBOLS.CANDY);
-                    if (isMatch) {
-                        let colWin = 10;
-                        if (currentJuiceInPlay) colWin *= 4;
-                        colWin *= 2; // Orangutan 2x Multiplier
-                        totalWin += colWin;
-                        fruitWinOccurred = true;
-                        winningIndices.push(col, col + 3, col + 6);
-                        addFloatingWin(colWin, col + 3);
-                    }
-                }
-            }
-        }
-
-        // 3. Scatter Checks (Money Bags)
-        let bagsFound = false;
-        newGrid.flat().forEach((s, idx) => {
-            if (s === SYMBOLS.MONEY) {
-                bagsFound = true;
-                let bagWin = 10;
-                if (currentBuffs.investor) {
-                    if (currentInvCount % 3 === 2) bagWin = 50;
-                    else bagWin = 0;
-                }
-
-                if (bagWin > 0 || (currentBuffs.investor && currentInvCount % 3 !== 2)) {
-                    winningIndices.push(idx);
-                    if (bagWin > 0) {
-                        totalWin += bagWin;
-                        addFloatingWin(bagWin, idx);
-                    }
-                }
-            }
-        });
-
-        if (bagsFound) {
-            setInvestorCount(prev => prev + 1);
-        }
-
-        if (currentBuffs.mining && bombMatchOccurred) {
-            setMiningTurns(3);
-        }
-
-        // Last Peach Buff
-        if (gridBuffs.lastPeach && newGrid[2][2] === '🍑') {
-            totalWin *= 2;
-            // Maybe add a visual indicator?
-            addFloatingWin("x2", 8); // 8 is index of bottom right
-        }
-
-        setJuiceBoxActiveNext(currentBuffs.juiceBox && fruitWinOccurred);
-        setWinningCells([...new Set(winningIndices)]);
-        return totalWin;
-    };
-
-    const handleSpin = () => {
-        if (balance < spinCost || isSpinning) return;
-
-        // Spinflation Trigger Check
-        if (totalSpins > 0 && totalSpins >= nextSpinflationThreshold) {
-            setNextSpinflationThreshold(prev => prev + 20);
-            setSpinCost(prev => prev * 2);
-            setShowSpinflation(true);
-            return;
-        }
-
-        const snapshotBuffs = { ...buffs };
-        const snapshotJuice = juiceBoxActiveNext;
-        const snapshotInvCount = investorCount;
-        const snapshotMiningTurns = miningTurns;
-
-        setActiveBuffsInPlay(snapshotBuffs);
-        setJuiceBoxInPlay(snapshotJuice);
-        setActiveInvestorCount(snapshotInvCount);
-        setActiveMiningTurns(snapshotMiningTurns);
-
-        setBalance(prev => prev - spinCost);
-        setTotalSpins(prev => prev + 1);
-        setIsSpinning(true);
-        setLastWin(0);
-        setWinningCells([]);
-        setRevealingColumn(-1);
-
-        if (lockedSymbol) {
-            setLockSpinsRemaining(prev => {
-                const nextValue = prev - 1;
-                return nextValue < 0 ? 0 : nextValue;
-            });
-        }
-
-        if (miningTurns > 0) {
-            setMiningTurns(prev => prev - 1);
-        }
-
-        const flatResults = [];
-        for (let i = 0; i < 9; i++) {
-            if (i === 0 && lockedSymbol) {
-                flatResults.push(lockedSymbol);
-            } else {
-                flatResults.push(getRandomSymbol(flatResults, snapshotMiningTurns > 0));
-            }
-        }
-
-        const nextGrid = [
-            [flatResults[0], flatResults[1], flatResults[2]],
-            [flatResults[3], flatResults[4], flatResults[5]],
-            [flatResults[6], flatResults[7], flatResults[8]]
-        ];
-
-        [0, 1, 2].forEach((col, i) => {
-            setTimeout(() => {
-                setGrid(prev => {
-                    const newGrid = [...prev.map(row => [...row])];
-                    newGrid[0][col] = nextGrid[0][col];
-                    newGrid[1][col] = nextGrid[1][col];
-                    newGrid[2][col] = nextGrid[2][col];
-                    return newGrid;
-                });
-                setRevealingColumn(col);
-
-                if (col === 2) {
-                    setTimeout(() => {
-                        const win = calculateResults(nextGrid, snapshotJuice, snapshotBuffs, snapshotInvCount);
-                        setLastWin(win);
-                        setBalance(prev => prev + win);
-                        setIsSpinning(false);
-
-                        setLockSpinsRemaining(prev => {
-                            if (prev === 0) setLockedSymbol(null);
-                            return prev;
-                        });
-                    }, 250);
-                }
-            }, i * 150);
-        });
-    };
-
-    const activeBuffList = [...BUFF_DEFINITIONS, ...S_TIER_BUFFS].filter(b => buffs[b.id]);
 
     return (
         <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-4 md:p-8 select-none">
-
             {/* Header / Stats */}
-            <div className="w-full max-w-md flex justify-between items-center mb-2 bg-white px-6 py-2 rounded-[2rem] shadow-sm border border-stone-200 sticky top-4 z-50">
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3">
-                        <div className="text-amber-400 shrink-0">
-                            <Coins size={32} />
-                        </div>
-                        <motion.span className="text-3xl font-black tabular-nums tracking-tighter leading-none">{displayBalance}</motion.span>
-                    </div>
-                    {/* Active Buffs Indicators */}
-                    <div className="flex gap-2">
-                        {buffs.mining && miningTurns > 0 && <div className="text-cyan-500 font-black flex items-center gap-1"><span className="text-sm">💥</span> {miningTurns}</div>}
-                        {(!hasUsedLock || lockedSymbol) && (
-                            <div className={`${lockedSymbol ? "text-amber-500" : "text-stone-300"} font-black flex items-center gap-1`}>
-                                <Lock size={12} /> {lockedSymbol && lockSpinsRemaining}
-                            </div>
-                        )}
-                    </div>
-                </div>
-                <AnimatePresence mode="wait">
-                    {lastWin !== 0 && !isSpinning && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className={`font-black text-xl uppercase tracking-widest whitespace-nowrap ${lastWin < 0 ? 'text-red-500' : 'text-green-500'}`}
-                        >
-                            {lastWin < 0 ? `Penalty ${lastWin}` : `+${lastWin}`}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+            <Header
+                displayBalance={displayBalance}
+                buffs={buffs}
+                miningTurns={miningTurns}
+                lockedSymbol={lockedSymbol}
+                lockSpinsRemaining={lockSpinsRemaining}
+                lastWin={lastWin}
+                isSpinning={isSpinning}
+            />
 
             <AnimatePresence mode="wait">
                 {view === 'game' ? (
@@ -544,6 +90,7 @@ const App = () => {
                         spinCost={spinCost}
                         enterShop={enterShop}
                         setView={setView}
+                        gridBuffs={gridBuffs}
                     />
                 ) : view === 'shop' ? (
                     <ShopView
@@ -560,199 +107,10 @@ const App = () => {
                         balance={balance}
                         gridBuffs={gridBuffs}
                         purchaseGridBuff={purchaseGridBuff}
+                        unlockedItems={unlockedItems}
                     />
                 ) : (
-                    <motion.div
-                        key="info"
-                        initial={{ opacity: 1 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="w-full flex flex-col items-center max-w-md h-[calc(100vh-100px)]"
-                    >
-                        {/* Compact Header */}
-                        <div className="w-full mb-3 flex justify-between items-center sticky top-2 z-50">
-                            <button
-                                onClick={() => setView('game')}
-                                className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm text-stone-900 hover:bg-white font-black transition-all border border-stone-200 text-sm"
-                            >
-                                <ArrowLeft size={16} />
-                                Back
-                            </button>
-                            <span className="text-xs font-black uppercase tracking-widest text-stone-400 bg-white/90 px-3 py-1.5 rounded-full border border-stone-200">
-                                Guide
-                            </span>
-                        </div>
-
-                        <div className="w-full flex-1 overflow-y-auto min-h-0 space-y-3 pb-4">
-
-                            {/* Combined Grid for Paytable */}
-                            <div className="grid grid-cols-2 gap-2">
-                                {/* Diamond - Jackpot - Full Width */}
-                                <div className="col-span-2 flex items-center gap-3 bg-white p-3 rounded-2xl border border-stone-200 shadow-sm relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-cyan-50/50 z-0"></div>
-                                    <div className="text-4xl shadow-sm bg-white w-12 h-12 rounded-xl flex items-center justify-center relative z-10">💎</div>
-                                    <div className="flex-1 relative z-10">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-black text-stone-900 uppercase text-sm">Jackpot</h4>
-                                            <span className="text-[10px] font-bold bg-cyan-100 text-cyan-600 px-1.5 py-0.5 rounded-full">3%</span>
-                                        </div>
-                                        <p className="text-[10px] text-stone-500 font-medium leading-tight">Match 3 Diamonds.</p>
-                                    </div>
-                                    <div className="flex flex-col items-end relative z-10">
-                                        <span className="font-black text-lg text-cyan-600">+100</span>
-                                    </div>
-                                </div>
-
-                                {/* Fruits */}
-                                <div className="col-span-2 flex items-center gap-3 bg-white p-2.5 rounded-2xl border border-stone-200 shadow-sm">
-                                    <div className="flex -space-x-2 shrink-0 pl-1">
-                                        {SYMBOLS.FRUIT.map((f, i) => (
-                                            <div key={i} className="w-8 h-8 bg-stone-50 rounded-full flex items-center justify-center text-lg shadow-sm border border-stone-100 relative z-[10] first:z-[40] second:z-[30]">{f}</div>
-                                        ))}
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-bold text-stone-900 text-xs">Fruit Match</h4>
-                                            <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded-full">72%</span>
-                                        </div>
-                                        <p className="text-[10px] text-stone-400">Match 3</p>
-                                    </div>
-                                    <div className="font-black text-stone-900 text-base pr-2">+10</div>
-                                </div>
-
-                                {/* Bomb */}
-                                <div className="col-span-2 flex items-center gap-3 bg-red-50/50 p-2.5 rounded-2xl border border-red-100 shadow-sm">
-                                    <div className="text-2xl w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm">💣</div>
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-black text-red-900 uppercase text-xs">Penalty</h4>
-                                            <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">15%</span>
-                                        </div>
-                                        <p className="text-[10px] text-red-700/70 font-medium">Match 3. Minus points.</p>
-                                    </div>
-                                    <div className="font-black text-red-500 text-base pr-2">-50</div>
-                                </div>
-
-                                {/* Wild */}
-                                <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
-                                    <div className="text-2xl mb-1">🍬</div>
-                                    <div className="flex items-center gap-1 mb-0.5">
-                                        <span className="font-bold text-[10px] uppercase text-stone-900">Wild</span>
-                                        <span className="text-[9px] font-bold bg-stone-100 text-stone-500 px-1 rounded-full">4.5%</span>
-                                    </div>
-                                    <p className="text-[9px] text-stone-400 leading-tight">Max 1/spin</p>
-                                </div>
-
-                                {/* Scatter */}
-                                <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
-                                    <div className="text-2xl mb-1">💰</div>
-                                    <div className="flex items-center gap-1 mb-0.5">
-                                        <span className="font-bold text-[10px] uppercase text-stone-900">Scatter</span>
-                                        <span className="text-[9px] font-bold bg-stone-100 text-stone-500 px-1 rounded-full">6%</span>
-                                    </div>
-                                    <p className="text-[9px] text-stone-400 leading-tight">Instant +10</p>
-                                </div>
-                            </div>
-
-                            {/* Mechanics - Compact Dark Mode */}
-                            <div className="bg-stone-900 text-stone-300 rounded-2xl p-4 shadow-lg relative overflow-hidden">
-                                <div className="grid grid-cols-1 gap-4 relative z-10">
-                                    {/* Locking */}
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                                            <Lock size={14} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <h4 className="font-bold text-white text-xs mb-1">Symbol Locking</h4>
-                                                <span className="text-[10px] font-black text-amber-400 bg-amber-900/30 px-1.5 rounded">1/GAME</span>
-                                            </div>
-                                            <p className="text-[10px] text-stone-400 leading-relaxed">
-                                                Top-Left symbol stays for {LOCK_DURATION} spins.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="h-px bg-stone-800 w-full"></div>
-
-                                    {/* Spinflation */}
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
-                                            <TrendingUp size={14} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-white text-xs mb-1">Spinflation</h4>
-                                            <p className="text-[10px] text-stone-400 leading-relaxed">
-                                                Spin cost doubles every 20 spins.
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="h-px bg-stone-800 w-full"></div>
-
-                                    {/* S-Tier Buffs */}
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center shrink-0">
-                                            <Star size={14} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-white text-xs mb-1">S-Tier Buffs</h4>
-                                            <p className="text-[10px] text-stone-400 leading-relaxed">
-                                                Only one can be held at a time.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Section: Mechanics (Old) - To Delete */}
-                            <div className="hidden">
-                                <div className="absolute -right-4 -top-4 text-stone-800 opacity-20 rotate-12">
-                                    <Zap size={150} />
-                                </div>
-
-                                <h3 className="text-sm font-black uppercase tracking-widest text-white mb-6 flex items-center gap-2 relative z-10">
-                                    <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                                    Mechanics
-                                </h3>
-
-                                <div className="space-y-6 relative z-10">
-
-                                    {/* Locking */}
-                                    <div className="flex gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                                            <Lock size={20} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-white mb-1">Symbol Locking</h4>
-                                            <p className="text-xs text-stone-400 leading-relaxed mb-2">
-                                                Click the <strong className="text-white">Top-Left</strong> symbol to lock it for {LOCK_DURATION} spins. Once per game.
-                                            </p>
-                                            <div className="inline-flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700">
-                                                <span className="text-[10px] font-bold text-stone-500 uppercase">Usage</span>
-                                                <span className="font-black text-amber-400 text-sm">1/Match</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Spinflation */}
-                                    <div className="flex gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
-                                            <TrendingUp size={20} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-white mb-1">Spinflation</h4>
-                                            <p className="text-xs text-stone-400 leading-relaxed">
-                                                Spin costs double every 20 spins. Manage your balance wisely!
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </motion.div>
+                    <InfoView setView={setView} />
                 )}
             </AnimatePresence>
 
@@ -785,10 +143,53 @@ const App = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </div >
+
+            {/* Game Over Modal */}
+            <AnimatePresence>
+                {gameOver && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="bg-stone-900 rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-2 border-stone-800 relative overflow-hidden"
+                        >
+                            <div className="mb-6 relative">
+                                <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-1">Game Over</h2>
+                            </div>
+
+                            <div className="mb-6">
+                                <div className="text-stone-400 text-xs font-bold uppercase tracking-wider mb-1">Highest Spinflation</div>
+                                <div className="text-3xl font-black text-red-500">{spinCost}</div>
+                            </div>
+
+                            {newUnlocks.length > 0 && (
+                                <div className="mb-8">
+                                    <div className="text-amber-400 font-bold uppercase tracking-wider text-xs mb-3 flex items-center justify-center gap-2">
+                                        <Unlock size={14} /> New Unlocks!
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        {newUnlocks.map(u => (
+                                            <div key={u} className="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-200 font-black uppercase text-sm animate-pulse">
+                                                {formatUnlockName(u)}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={resetGame}
+                                className="w-full py-4 bg-white hover:bg-stone-200 text-stone-900 font-black rounded-xl uppercase tracking-widest transition-colors shadow-lg ring-offset-2 focus:ring-2 ring-white ring-offset-stone-900"
+                            >
+                                Play Again
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 };
-
-
 
 export default App;
