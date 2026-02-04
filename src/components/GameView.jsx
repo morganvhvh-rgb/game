@@ -43,6 +43,21 @@ const GameView = ({
         }
     }, [isBuffMenuOpen]);
 
+    const handleBuffClick = (buff) => {
+        if (buffs[buff.id]) return; // Already owned
+
+        if (selectedBuff?.id === buff.id) {
+            // Second tap - Buy
+            if (balance >= 50) {
+                purchaseCard({ ...buff, price: 50 });
+                setSelectedBuff(null);
+            }
+        } else {
+            // First tap - Select
+            setSelectedBuff({ ...buff, price: 50 });
+        }
+    };
+
     return (
         <motion.div
             key="game"
@@ -61,62 +76,67 @@ const GameView = ({
                         animate={{ opacity: 1, scale: 1 }}
                         className="w-full h-full flex flex-col items-center justify-center"
                     >
-                        <div className="mb-4 flex items-center gap-2 text-stone-400 font-black uppercase tracking-widest text-xs">
-                            <ShoppingCart size={14} /> Buffer Overflow
-                        </div>
+                        <div className="grid grid-cols-3 gap-2 w-full max-w-[320px] h-full content-center p-2">
+                            {BUFF_DEFINITIONS.map((buff, i) => {
+                                const isSelected = selectedBuff?.id === buff.id;
+                                const isOwned = buffs[buff.id];
 
-                        {selectedBuff ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center">
-                                <div className="flex-1 w-full flex items-center justify-center p-4">
-                                    <PlayingCard
-                                        card={selectedBuff}
-                                        index={0}
-                                        owned={buffs[selectedBuff.id]}
-                                        balance={balance}
-                                        onPurchase={() => {
-                                            purchaseCard(selectedBuff);
-                                            setSelectedBuff(null);
-                                            setIsBuffMenuOpen(false);
-                                        }}
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => setSelectedBuff(null)}
-                                    className="mt-2 text-stone-400 font-bold text-xs uppercase hover:text-stone-600 mb-4 px-4 py-2"
-                                >
-                                    Back to Grid
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-3 gap-3 w-full max-w-[300px] p-2">
-                                {BUFF_DEFINITIONS.map((buff, i) => (
+                                return (
                                     <motion.div
                                         key={buff.id}
                                         layout
                                         initial={{ scale: 0, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
+                                        animate={{
+                                            scale: isSelected ? 1.05 : 1,
+                                            opacity: 1,
+                                            borderColor: isSelected ? '#fbbf24' : (isOwned ? '#e7e5e4' : '#e7e5e4')
+                                        }}
                                         transition={{ delay: i * 0.05 }}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => setSelectedBuff({ ...buff, price: 50 })}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => handleBuffClick(buff)}
                                         className={`
-                                            aspect-[2/3] rounded-xl shadow-sm border flex flex-col items-center justify-between p-1 cursor-pointer transition-colors
-                                            ${buffs[buff.id] ? 'bg-stone-100 border-stone-200' : 'bg-white border-stone-200 hover:border-amber-400'}
+                                            aspect-[2/3.2] rounded-xl shadow-sm border-2 flex flex-col relative overflow-hidden cursor-pointer transition-colors bg-white w-full
+                                            ${isSelected ? 'ring-2 ring-amber-400 ring-offset-2 z-10' : ''}
+                                            ${isOwned ? 'bg-stone-100 opacity-60' : 'hover:border-amber-200'}
                                         `}
                                     >
-                                        <div className="w-full flex justify-end p-0.5">
-                                            {buffs[buff.id] && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                                        {/* Dumbbell Icon Top-Left */}
+                                        <div className="absolute top-1.5 left-1.5 z-10">
+                                            <Dumbbell size={12} className="fill-black text-black" />
                                         </div>
-                                        <div className="text-2xl filter drop-shadow-sm">{buff.icon}</div>
-                                        <div className="w-full border-t border-stone-100 pt-1 pb-1">
-                                            <div className="text-[0.5rem] leading-none font-black uppercase text-stone-500 text-center w-full truncate px-0.5">
-                                                {buff.title}
+
+                                        {/* Status Indicators Top-Right */}
+                                        <div className="absolute top-1 right-1 flex flex-col gap-1 items-end">
+                                            {isOwned && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                                        </div>
+
+                                        <div className="flex-1 flex flex-col items-center justify-start pt-5">
+                                            <div className="text-3xl filter drop-shadow-sm mb-1">{buff.icon}</div>
+
+                                            {/* Description */}
+                                            <div className="px-1 w-full text-center flex flex-col h-full">
+                                                <div className="text-[0.65rem] leading-tight font-black uppercase text-stone-800 mb-1 break-words line-clamp-2">
+                                                    {buff.title}
+                                                </div>
+                                                <div className="text-[0.55rem] leading-tight font-medium text-stone-500 line-clamp-3">
+                                                    {buff.desc}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {/* Buy Overlay for Selected */}
+                                        {isSelected && !isOwned && (
+                                            <div className="absolute bottom-0 w-full bg-amber-400 py-1 flex items-center justify-center">
+                                                <span className="text-[0.65rem] font-black uppercase text-stone-900">
+                                                    50 Coins
+                                                </span>
+                                            </div>
+                                        )}
                                     </motion.div>
-                                ))}
-                            </div>
-                        )}
+                                );
+                            })}
+                        </div>
                     </motion.div>
                 ) : (
                     <div
