@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Unlock } from 'lucide-react';
 import { BUFF_DEFINITIONS } from './data/gameConfig';
 import GameView from './components/GameView';
-import ShopView from './components/ShopView';
+import ExtrasView from './components/ExtrasView';
 import InfoView from './components/InfoView';
 import Header from './components/Header';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -40,7 +40,7 @@ const App = () => {
         lotteryFail,
         gridBuffs,
         resetGame,
-        enterShop,
+
         handleDeal,
         handleLottery,
         purchaseCard,
@@ -49,6 +49,17 @@ const App = () => {
         handleSpin,
         activeBuffList,
     } = useGameLogic();
+
+    const [isBuffMenuOpen, setIsBuffMenuOpen] = React.useState(false);
+
+    // Enter shop function now toggles the overlay and resets phase
+    const enterShop = () => {
+        if (view === 'extras') {
+            setView('game');
+        }
+        setShopPhase('menu'); // Always reset to menu when toggling
+        setIsBuffMenuOpen(!isBuffMenuOpen);
+    };
 
     // Format unlock names for display
     const formatUnlockName = (id) => {
@@ -91,19 +102,21 @@ const App = () => {
                         enterShop={enterShop}
                         setView={setView}
                         gridBuffs={gridBuffs}
-                    />
-                ) : view === 'shop' ? (
-                    <ShopView
-                        setView={setView}
+                        buffs={buffs}
+                        // Shop / Overlay Props
+                        isBuffMenuOpen={isBuffMenuOpen}
+                        setIsBuffMenuOpen={setIsBuffMenuOpen}
                         shopPhase={shopPhase}
                         setShopPhase={setShopPhase}
-                        buffs={buffs}
-                        BUFF_DEFINITIONS={BUFF_DEFINITIONS}
                         handleDeal={handleDeal}
-                        handleLottery={handleLottery}
                         dealtCards={dealtCards}
-                        lotteryFail={lotteryFail}
                         purchaseCard={purchaseCard}
+                    />
+                ) : view === 'extras' ? (
+                    <ExtrasView
+                        setView={setView}
+                        handleLottery={handleLottery}
+                        lotteryFail={lotteryFail}
                         balance={balance}
                         gridBuffs={gridBuffs}
                         purchaseGridBuff={purchaseGridBuff}
