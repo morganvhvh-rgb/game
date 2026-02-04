@@ -41,7 +41,7 @@ const App = () => {
         gridBuffs,
         resetGame,
 
-        handleDeal,
+
         handleLottery,
         purchaseCard,
         purchaseGridBuff,
@@ -108,7 +108,7 @@ const App = () => {
                         setIsBuffMenuOpen={setIsBuffMenuOpen}
                         shopPhase={shopPhase}
                         setShopPhase={setShopPhase}
-                        handleDeal={handleDeal}
+
                         dealtCards={dealtCards}
                         purchaseCard={purchaseCard}
                     />

@@ -155,39 +155,7 @@ export const useGameLogic = () => {
         setView('shop');
     };
 
-    const handleDeal = (dealType) => {
-        let cost = 0;
-        let count = 0;
-        let pricingStrategy = '';
 
-        if (dealType === 'fair') { cost = 10; count = 2; pricingStrategy = 'fair'; }
-        if (dealType === 'volatile') { cost = 20; count = 3; pricingStrategy = 'volatile'; }
-        if (dealType === 'great') { cost = 30; count = 1; pricingStrategy = 'great'; }
-
-        if (balance < cost) return;
-
-        setBalance(prev => prev - cost);
-
-        // Logic to pick 'count' unique buffs
-        const shuffledBuffs = [...BUFF_DEFINITIONS].sort(() => 0.5 - Math.random());
-        const selected = shuffledBuffs.slice(0, count);
-
-        // Volatile Prices Pool
-        const volatilePrices = [25, 40, 55].sort(() => 0.5 - Math.random());
-
-        const cards = selected.map((buff, index) => {
-            let price = 40; // Default Base
-            if (pricingStrategy === 'fair') price = 40;
-            if (pricingStrategy === 'great') price = 10;
-            if (pricingStrategy === 'volatile') price = volatilePrices[index];
-
-            return { ...buff, price };
-        });
-
-        setDealtCards(cards);
-        setLotteryFail(false);
-        setShopPhase('reveal');
-    };
 
     const handleLottery = () => {
         const cost = 50;
@@ -226,8 +194,6 @@ export const useGameLogic = () => {
             if (card.id === 'investor') {
                 setInvestorCount(0);
             }
-            // Return to game after purchase
-            setView('game');
         }
     };
 
@@ -585,7 +551,6 @@ export const useGameLogic = () => {
         gridBuffs,
         resetGame,
         enterShop,
-        handleDeal,
         handleLottery,
         purchaseCard,
         purchaseGridBuff,
