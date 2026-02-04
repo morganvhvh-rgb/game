@@ -377,7 +377,7 @@ const App = () => {
         <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-4 md:p-8 select-none">
 
             {/* Header / Stats */}
-            <div className="w-full max-w-md flex justify-between items-center mb-6 bg-white px-6 py-4 rounded-[2rem] shadow-sm border border-stone-200 sticky top-4 z-50">
+            <div className="w-full max-w-md flex justify-between items-center mb-2 bg-white px-6 py-2 rounded-[2rem] shadow-sm border border-stone-200 sticky top-4 z-50">
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-3">
                         <div className="text-amber-400 shrink-0">
@@ -484,13 +484,19 @@ const App = () => {
 
                                             {isWinning && (
                                                 <motion.div
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: [0, 0.8, 0] }}
-                                                    transition={{ duration: 2, times: [0, 0.1, 1], ease: "easeOut" }}
-                                                    className={`absolute inset-0 rounded-[1.5rem] z-0 ${grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB
-                                                        ? 'bg-red-500'
-                                                        : 'bg-pink-500'
-                                                        }`}
+                                                    initial={{ opacity: 0.8 }}
+                                                    animate={{
+                                                        opacity: [0.8, 0.8, 0],
+                                                        backgroundColor: grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB
+                                                            ? ['#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444']
+                                                            : ['#ec4899', '#ec4899', '#22c55e', '#22c55e', '#eab308', '#eab308']
+                                                    }}
+                                                    transition={{
+                                                        duration: 2,
+                                                        opacity: { times: [0, 0.8, 1] },
+                                                        backgroundColor: { times: [0, 0.33, 0.331, 0.66, 0.661, 1] }
+                                                    }}
+                                                    className="absolute inset-0 rounded-[1.5rem] z-0"
                                                 />
                                             )}
                                         </div>
@@ -507,11 +513,11 @@ const App = () => {
                                         animate={{ opacity: 1, y: -40, scale: 1.0 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.6, ease: "backOut" }}
-                                        className="absolute z-50 pointer-events-none font-black text-2xl text-white"
+                                        className="absolute z-50 pointer-events-none font-black text-2xl text-black"
                                         style={{
                                             left: `${(win.cellIndex % 3) * 33 + 16}%`,
                                             top: `${Math.floor(win.cellIndex / 3) * 33 + 16}%`,
-                                            textShadow: '3px 3px 0 #000'
+                                            textShadow: '3px 3px 0 #fff'
                                         }}
                                     >
                                         {win.val > 0 ? `+${win.val}` : win.val}
@@ -531,8 +537,8 @@ const App = () => {
                                         exit={{ opacity: 0, scale: 0.8 }}
                                         className="absolute inset-0 flex items-center justify-center"
                                     >
-                                        <div className="text-stone-300 text-xs font-bold uppercase tracking-widest border-2 border-dashed border-stone-200/50 rounded-xl px-8 py-4">
-                                            Buff Deck Empty
+                                        <div className="text-stone-300/50">
+                                            <Dumbbell size={48} />
                                         </div>
                                     </motion.div>
                                 ) : (
@@ -596,7 +602,7 @@ const App = () => {
                                 whileTap={{ scale: 0.97 }}
                                 onClick={enterShop}
                                 disabled={isSpinning}
-                                className="w-full py-4 rounded-[1.5rem] bg-white text-stone-900 font-black uppercase tracking-tight border-2 border-stone-100 hover:border-amber-200 transition-colors flex items-center justify-center gap-2"
+                                className="w-full py-4 rounded-[1.5rem] bg-white text-stone-900 text-2xl font-black uppercase tracking-tight border-2 border-stone-100 hover:border-amber-200 transition-colors flex items-center justify-center gap-2"
                             >
                                 <Dumbbell size={20} className="fill-black text-black" />
                                 Buff Cards
