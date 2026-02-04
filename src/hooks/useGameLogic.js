@@ -151,6 +151,7 @@ export const useGameLogic = () => {
     const enterShop = () => {
         setShopPhase('menu');
         setLotteryFail(false);
+        setWinningCells([]); // Clear win animations
         setView('shop');
     };
 
@@ -198,7 +199,7 @@ export const useGameLogic = () => {
 
         if (isWin) {
             const randomSTier = S_TIER_BUFFS[Math.floor(Math.random() * S_TIER_BUFFS.length)];
-            setDealtCards([{ ...randomSTier, price: 200 }]);
+            setDealtCards([{ ...randomSTier, price: 100 }]);
             setLotteryFail(false);
         } else {
             setDealtCards([]);

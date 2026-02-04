@@ -42,7 +42,7 @@ const ShopView = ({
                         {shopPhase === 'menu' ? 'Dealer Selection' : 'Choose Wisely'}
                     </h2>
                     <div className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-black">
-                        {Object.values(buffs).filter(Boolean).length}/{BUFF_DEFINITIONS.length} Owned
+                        {BUFF_DEFINITIONS.filter(b => buffs[b.id]).length}/{BUFF_DEFINITIONS.length} Owned
                     </div>
                 </div>
             </div>
