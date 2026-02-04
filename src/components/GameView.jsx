@@ -102,18 +102,14 @@ const GameView = ({
 
                                 {isWinning && (
                                     <motion.div
-                                        initial={{ opacity: 0.8 }}
-                                        animate={{
-                                            opacity: [0.8, 0.8, 0],
-                                            backgroundColor: grid.flat()[winningCells.find(i => winningCells.includes(i))] === SYMBOLS.BOMB
-                                                ? ['#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444', '#ef4444']
-                                                : ['#ec4899', '#ec4899', '#22c55e', '#22c55e', '#eab308', '#eab308']
-                                        }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: [0, 0.8, 0.8, 0] }}
                                         transition={{
-                                            duration: 2,
-                                            opacity: { times: [0, 0.8, 1] },
-                                            backgroundColor: { times: [0, 0.33, 0.331, 0.66, 0.661, 1] }
+                                            duration: 1.2,
+                                            times: [0, 0.1, 0.8, 1],
+                                            ease: "easeInOut"
                                         }}
+                                        style={{ backgroundColor: '#ff69b4' }}
                                         className="absolute inset-0 rounded-[1.5rem] z-0"
                                     />
                                 )}
@@ -155,8 +151,9 @@ const GameView = ({
                             exit={{ opacity: 0, scale: 0.8 }}
                             className="absolute inset-0 flex items-center justify-center"
                         >
-                            <div className="text-stone-300/50">
-                                <Dumbbell size={48} />
+                            <div className="text-stone-300 relative flex items-center justify-center">
+                                <Dumbbell size={48} className="fill-current" />
+                                <span className="absolute top-full mt-2 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">no buff cards</span>
                             </div>
                         </motion.div>
                     ) : (

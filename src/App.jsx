@@ -112,7 +112,7 @@ const App = () => {
 
         setBalance(prev => prev - cost);
 
-        const isWin = Math.random() < 0.1;
+        const isWin = Math.random() < 0.2;
 
         if (isWin) {
             const randomSTier = S_TIER_BUFFS[Math.floor(Math.random() * S_TIER_BUFFS.length)];
@@ -499,7 +499,7 @@ const App = () => {
                                     <div className="flex-1 relative z-10">
                                         <div className="flex items-center gap-2">
                                             <h4 className="font-black text-stone-900 uppercase text-sm">Jackpot</h4>
-                                            <span className="text-[10px] font-bold bg-cyan-100 text-cyan-600 px-1.5 py-0.5 rounded-full">RARE</span>
+                                            <span className="text-[10px] font-bold bg-cyan-100 text-cyan-600 px-1.5 py-0.5 rounded-full">3%</span>
                                         </div>
                                         <p className="text-[10px] text-stone-500 font-medium leading-tight">Match 3 Diamonds.</p>
                                     </div>
@@ -516,7 +516,10 @@ const App = () => {
                                         ))}
                                     </div>
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-stone-900 text-xs">Fruit Match</h4>
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="font-bold text-stone-900 text-xs">Fruit Match</h4>
+                                            <span className="text-[10px] font-bold bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded-full">72%</span>
+                                        </div>
                                         <p className="text-[10px] text-stone-400">Match 3</p>
                                     </div>
                                     <div className="font-black text-stone-900 text-base pr-2">+10</div>
@@ -526,8 +529,11 @@ const App = () => {
                                 <div className="col-span-2 flex items-center gap-3 bg-red-50/50 p-2.5 rounded-2xl border border-red-100 shadow-sm">
                                     <div className="text-2xl w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm">💣</div>
                                     <div className="flex-1">
-                                        <h4 className="font-black text-red-900 uppercase text-xs">Penalty</h4>
-                                        <p className="text-[10px] text-red-700/70 font-medium">Minus points</p>
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="font-black text-red-900 uppercase text-xs">Penalty</h4>
+                                            <span className="text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">15%</span>
+                                        </div>
+                                        <p className="text-[10px] text-red-700/70 font-medium">Match 3. Minus points.</p>
                                     </div>
                                     <div className="font-black text-red-500 text-base pr-2">-50</div>
                                 </div>
@@ -535,14 +541,20 @@ const App = () => {
                                 {/* Wild */}
                                 <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
                                     <div className="text-2xl mb-1">🍬</div>
-                                    <div className="font-bold text-[10px] uppercase text-stone-900">Wild</div>
+                                    <div className="flex items-center gap-1 mb-0.5">
+                                        <span className="font-bold text-[10px] uppercase text-stone-900">Wild</span>
+                                        <span className="text-[9px] font-bold bg-stone-100 text-stone-500 px-1 rounded-full">4.5%</span>
+                                    </div>
                                     <p className="text-[9px] text-stone-400 leading-tight">Max 1/spin</p>
                                 </div>
 
                                 {/* Scatter */}
                                 <div className="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
                                     <div className="text-2xl mb-1">💰</div>
-                                    <div className="font-bold text-[10px] uppercase text-stone-900">Scatter</div>
+                                    <div className="flex items-center gap-1 mb-0.5">
+                                        <span className="font-bold text-[10px] uppercase text-stone-900">Scatter</span>
+                                        <span className="text-[9px] font-bold bg-stone-100 text-stone-500 px-1 rounded-full">6%</span>
+                                    </div>
                                     <p className="text-[9px] text-stone-400 leading-tight">Instant +10</p>
                                 </div>
                             </div>
@@ -578,6 +590,22 @@ const App = () => {
                                             <h4 className="font-bold text-white text-xs mb-1">Spinflation</h4>
                                             <p className="text-[10px] text-stone-400 leading-relaxed">
                                                 Spin cost doubles every 20 spins.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="h-px bg-stone-800 w-full"></div>
+
+                                    {/* S-Tier Buffs */}
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center shrink-0">
+                                            <Star size={14} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white text-xs mb-1">S-Tier Buffs</h4>
+                                            <p className="text-[10px] text-stone-400 leading-relaxed">
+                                                Only one can be held at a time.
                                             </p>
                                         </div>
                                     </div>

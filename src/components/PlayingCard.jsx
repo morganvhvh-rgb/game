@@ -16,7 +16,7 @@ const PlayingCard = ({ card, index, owned, balance, onPurchase }) => {
                 ${owned ? 'border-stone-100 bg-stone-50' : 'border-stone-900'}
             `}
         >
-            <div className="text-4xl sm:text-5xl mb-2 sm:mb-4 p-2 sm:p-3 bg-stone-50 rounded-full shadow-inner mt-2">{card.icon}</div>
+            <div className="text-4xl sm:text-5xl mb-2 sm:mb-4 mt-2">{card.icon}</div>
 
             <h3 className="text-sm sm:text-lg font-black uppercase tracking-tight mb-1 leading-tight">{card.title}</h3>
             <p className="text-[10px] sm:text-xs text-stone-500 font-medium mb-2 leading-tight px-1 flex-1 flex items-center justify-center">

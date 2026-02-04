@@ -70,7 +70,7 @@ const ShopView = ({
                                 count={3}
                                 onClick={() => handleDeal('volatile')}
                                 disabled={balance < 20}
-                                icon={<Zap className="text-amber-500" />}
+                                icon={<Zap className="text-red-500" />}
                             />
                             <DealOption
                                 title="Great Deal"
@@ -79,7 +79,7 @@ const ShopView = ({
                                 count={1}
                                 onClick={() => handleDeal('great')}
                                 disabled={balance < 30}
-                                icon={<Sparkles className="text-purple-500" />}
+                                icon={<Sparkles className="text-green-500" />}
                             />
                         </div>
 
@@ -101,7 +101,7 @@ const ShopView = ({
                                     <h3 className="font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
                                         Lottery Chance
                                     </h3>
-                                    <p className="text-xs text-stone-400 font-medium">10% Chance to buy an S-Tier Buff</p>
+                                    <p className="text-xs text-stone-400 font-medium">20% Chance to buy an S-Tier Buff</p>
                                 </div>
                             </div>
                             <div className="flex flex-col items-end">
@@ -111,6 +111,18 @@ const ShopView = ({
                                 </div>
                             </div>
                         </button>
+
+                        {/* Grid Buff Placeholders */}
+                        <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4">
+                            <div className="flex-1 bg-stone-100 p-4 rounded-[1.5rem] border-2 border-stone-200 flex flex-col items-center justify-center text-center opacity-50">
+                                <span className="font-bold text-stone-400 text-sm uppercase">Grid Buff 1</span>
+                                <span className="text-xs text-stone-400">Placeholder</span>
+                            </div>
+                            <div className="flex-1 bg-stone-100 p-4 rounded-[1.5rem] border-2 border-stone-200 flex flex-col items-center justify-center text-center opacity-50">
+                                <span className="font-bold text-stone-400 text-sm uppercase">Grid Buff 2</span>
+                                <span className="text-xs text-stone-400">Placeholder</span>
+                            </div>
+                        </div>
                     </motion.div>
                 ) : (
                     <motion.div
