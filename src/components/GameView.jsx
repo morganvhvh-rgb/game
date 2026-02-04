@@ -175,15 +175,15 @@ const GameView = ({
                                     }}
                                     exit={{ scale: 0, opacity: 0 }}
                                     whileHover={{ scale: 1.15, y: -20, rotate: 0, zIndex: 50 }}
-                                    className="w-18 h-24 bg-white rounded-xl shadow-xl border border-stone-100 flex flex-col items-center justify-between p-2 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl pointer-events-auto"
+                                    className="w-16 h-24 bg-white rounded-xl shadow-xl border border-stone-100 flex flex-col items-center justify-between p-1 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl pointer-events-auto"
                                     style={{ zIndex: i }}
                                 >
-                                    <div className="absolute top-1 left-1"><Dumbbell size={10} className="fill-black text-black" /></div>
+                                    <div className="absolute top-1 left-1"><Dumbbell size={8} className="fill-black text-black" /></div>
                                     <div className="flex-1 flex items-center justify-center">
-                                        <span className="text-4xl filter drop-shadow-sm">{buff.icon}</span>
+                                        <span className="text-3xl filter drop-shadow-sm">{buff.icon}</span>
                                     </div>
                                     <div className="w-full border-t border-stone-100 pt-1">
-                                        <div className="text-[0.55rem] leading-none font-black uppercase text-stone-500 text-center w-full truncate h-3">
+                                        <div className="text-[0.6rem] leading-none font-black uppercase text-stone-500 text-center w-full truncate">
                                             {buff.title}
                                         </div>
                                     </div>

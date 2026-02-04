@@ -117,11 +117,11 @@ const App = () => {
             {/* Spinflation Modal */}
             <AnimatePresence>
                 {showSpinflation && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60">
+                    <div className="fixed top-0 left-0 w-full h-full z-[100] flex items-center justify-center p-4 bg-black/60">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
                             className="bg-black rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-4 border-red-600 relative overflow-hidden"
                         >
                             <div className="mb-4 bg-stone-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border border-red-900/50">
@@ -147,11 +147,11 @@ const App = () => {
             {/* Game Over Modal */}
             <AnimatePresence>
                 {gameOver && (
-                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80">
+                    <div className="fixed top-0 left-0 w-full h-full z-[110] flex items-center justify-center p-4 bg-black/80">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
                             className="bg-stone-900 rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-2 border-stone-800 relative overflow-hidden"
                         >
                             <div className="mb-6 relative">
