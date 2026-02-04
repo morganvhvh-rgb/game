@@ -20,7 +20,7 @@ const DealOption = ({ title, desc, cost, count, onClick, disabled, icon }) => (
         <h3 className="text-sm sm:text-lg font-black uppercase tracking-tight mb-1 leading-tight">{title}</h3>
 
         {/* Count */}
-        <span className="text-[10px] sm:text-xs font-bold text-stone-400 mb-1">Deals {count} Cards</span>
+
 
         {/* Description */}
         <p className="text-[10px] sm:text-xs text-stone-500 font-medium mb-2 leading-tight px-1 flex-1 flex items-center justify-center">

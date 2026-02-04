@@ -19,6 +19,6 @@ export const BUFF_DEFINITIONS = [
 ];
 
 export const S_TIER_BUFFS = [
-    { id: 'angel', icon: '👼', title: 'Angel Buff', desc: 'S-Tier Placeholder' },
-    { id: 'devil', icon: '😈', title: 'Devil Buff', desc: 'S-Tier Placeholder' }
+    { id: 'angel', icon: '👼', title: 'Guardian Angel', desc: 'No Bombs. Cherries pay 5x.' },
+    { id: 'devil', icon: '😈', title: 'Daredevil', desc: '2x Bombs. Grapes pay 2x.' }
 ];

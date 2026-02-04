@@ -76,6 +76,8 @@ const GameView = ({
                                             <div className="absolute inset-0 pointer-events-none">
                                                 {juiceBoxInPlay && SYMBOLS.FRUIT.includes(symbol) && <span className="absolute -top-3 -left-3 text-2xl">🧃</span>}
                                                 {activeBuffsInPlay.grapeLove && symbol === '🍇' && <span className="absolute -bottom-3 -right-3 text-2xl">💜</span>}
+                                                {activeBuffsInPlay.devil && symbol === '🍇' && <span className="absolute -top-3 -right-3 text-2xl">😈</span>}
+                                                {activeBuffsInPlay.angel && symbol === '🍒' && <span className="absolute -top-3 -right-3 text-2xl">👼</span>}
                                                 {activeBuffsInPlay.halloween && symbol === SYMBOLS.CANDY && <span className="absolute -bottom-3 -right-3 text-2xl">🎃</span>}
                                                 {activeBuffsInPlay.orangutan && symbol === '🍌' && <span className="absolute -top-3 -right-3 text-2xl">🦧</span>}
                                                 {activeMiningTurns > 0 && symbol === SYMBOLS.DIAMOND && <span className="absolute -bottom-3 -right-3 text-2xl">💥</span>}

@@ -40,6 +40,8 @@ const App = () => {
     const [lockSpinsRemaining, setLockSpinsRemaining] = useState(0);
     const [miningTurns, setMiningTurns] = useState(0);
 
+    const [hasUsedLock, setHasUsedLock] = useState(false);
+
     // Buff State
     const [buffs, setBuffs] = useState({
         juiceBox: false,
@@ -47,7 +49,9 @@ const App = () => {
         halloween: false,
         investor: false,
         mining: false,
-        orangutan: false
+        orangutan: false,
+        angel: false,
+        devil: false
     });
 
     const [activeBuffsInPlay, setActiveBuffsInPlay] = useState({ ...buffs });
@@ -103,7 +107,7 @@ const App = () => {
     };
 
     const handleLottery = () => {
-        const cost = 100;
+        const cost = 50;
         if (balance < cost) return;
 
         setBalance(prev => prev - cost);
@@ -112,7 +116,9 @@ const App = () => {
 
         if (isWin) {
             const randomSTier = S_TIER_BUFFS[Math.floor(Math.random() * S_TIER_BUFFS.length)];
-            // Price is 200 for S-Tier Buffs
+            // Price is 200 for S-Tier Buffs -> Now reduced/free? Logic says "buying one". 
+            // Let's keep the price or reduce it? User didn't specify S-Tier card price, just lottery ticket. 
+            // Assuming 200 is fine as it's S-Tier.
             setDealtCards([{ ...randomSTier, price: 200 }]);
             setLotteryFail(false);
         } else {
@@ -123,9 +129,19 @@ const App = () => {
     };
 
     const purchaseCard = (card) => {
-        if (balance >= card.price && !buffs[card.id]) {
+        if (balance >= card.price) {
+            // Check if already owned (skip if so, but allow swapping S-tiers)
+            if (buffs[card.id]) return;
+
             setBalance(prev => prev - card.price);
-            setBuffs(prev => ({ ...prev, [card.id]: true }));
+
+            setBuffs(prev => {
+                const newBuffs = { ...prev, [card.id]: true };
+                // Enforce Exclusivity
+                if (card.id === 'angel') newBuffs.devil = false;
+                if (card.id === 'devil') newBuffs.angel = false;
+                return newBuffs;
+            });
 
             if (card.id === 'investor') {
                 setInvestorCount(0);
@@ -142,11 +158,12 @@ const App = () => {
             setLockedSymbol(null);
             setLockSpinsRemaining(0);
         } else {
-            if (balance >= LOCK_COST) {
+            // Free, Single Use
+            if (!hasUsedLock) {
                 const currentTopLeft = grid[0][0];
-                setBalance(prev => prev - LOCK_COST);
                 setLockedSymbol(currentTopLeft);
                 setLockSpinsRemaining(LOCK_DURATION);
+                setHasUsedLock(true);
             }
         }
     };
@@ -163,7 +180,12 @@ const App = () => {
         } else {
             // Standard Pool
             SYMBOLS.FRUIT.forEach(f => { for (let i = 0; i < 12; i++) pool.push(f); });
-            for (let i = 0; i < 10; i++) pool.push(SYMBOLS.BOMB);
+
+            let bombCount = 10;
+            if (buffs.devil) bombCount *= 2;
+            if (buffs.angel) bombCount = 0;
+
+            for (let i = 0; i < bombCount; i++) pool.push(SYMBOLS.BOMB);
             for (let i = 0; i < 2; i++) pool.push(SYMBOLS.DIAMOND);
             for (let i = 0; i < 4; i++) pool.push(SYMBOLS.MONEY);
         }
@@ -213,6 +235,8 @@ const App = () => {
                         let multiplier = 1;
                         if (currentJuiceInPlay) multiplier *= 4;
                         if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
+                        if (currentBuffs.devil && nonCandy === '🍇') multiplier *= 2;
+                        if (currentBuffs.angel && nonCandy === '🍒') multiplier *= 5;
                         if (currentBuffs.orangutan && nonCandy === '🍌') multiplier *= 2;
                         rowWin = 10 * multiplier;
                         fruitWinOccurred = true;
@@ -387,7 +411,11 @@ const App = () => {
                     {/* Active Buffs Indicators */}
                     <div className="flex gap-2">
                         {buffs.mining && miningTurns > 0 && <div className="text-cyan-500 font-black flex items-center gap-1"><span className="text-sm">💥</span> {miningTurns}</div>}
-                        {lockedSymbol && <div className="text-amber-500 font-black flex items-center gap-1"><Lock size={12} /> {lockSpinsRemaining}</div>}
+                        {(!hasUsedLock || lockedSymbol) && (
+                            <div className={`${lockedSymbol ? "text-amber-500" : "text-stone-300"} font-black flex items-center gap-1`}>
+                                <Lock size={12} /> {lockedSymbol && lockSpinsRemaining}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <AnimatePresence mode="wait">
@@ -530,7 +558,7 @@ const App = () => {
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start">
                                                 <h4 className="font-bold text-white text-xs mb-1">Symbol Locking</h4>
-                                                <span className="text-[10px] font-black text-amber-400 bg-amber-900/30 px-1.5 rounded">{LOCK_COST}C</span>
+                                                <span className="text-[10px] font-black text-amber-400 bg-amber-900/30 px-1.5 rounded">1/GAME</span>
                                             </div>
                                             <p className="text-[10px] text-stone-400 leading-relaxed">
                                                 Top-Left symbol stays for {LOCK_DURATION} spins.
@@ -577,11 +605,11 @@ const App = () => {
                                         <div>
                                             <h4 className="font-bold text-white mb-1">Symbol Locking</h4>
                                             <p className="text-xs text-stone-400 leading-relaxed mb-2">
-                                                Click the <strong className="text-white">Top-Left</strong> symbol to lock it for {LOCK_DURATION} spins.
+                                                Click the <strong className="text-white">Top-Left</strong> symbol to lock it for {LOCK_DURATION} spins. Once per game.
                                             </p>
                                             <div className="inline-flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700">
-                                                <span className="text-[10px] font-bold text-stone-500 uppercase">Cost</span>
-                                                <span className="font-black text-amber-400 text-sm">{LOCK_COST}</span>
+                                                <span className="text-[10px] font-bold text-stone-500 uppercase">Usage</span>
+                                                <span className="font-black text-amber-400 text-sm">1/Match</span>
                                             </div>
                                         </div>
                                     </div>

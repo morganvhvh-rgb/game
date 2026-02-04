@@ -86,11 +86,11 @@ const ShopView = ({
                         {/* Lottery Option */}
                         <button
                             onClick={handleLottery}
-                            disabled={balance < 100}
+                            disabled={balance < 50}
                             className={`
                                 w-full bg-stone-900 p-4 rounded-[1.5rem] shadow-xl border-2 border-stone-800
                                 flex items-center justify-between text-white transition-all
-                                ${balance < 100 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-2xl hover:bg-black'}
+                                ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-2xl hover:bg-black'}
                             `}
                         >
                             <div className="flex items-center gap-4">
@@ -107,7 +107,7 @@ const ShopView = ({
                             <div className="flex flex-col items-end">
                                 <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">Ticket Price</span>
                                 <div className="flex items-center gap-1 font-black text-xl text-white">
-                                    100 <Coins size={16} className="text-amber-400 fill-amber-400" />
+                                    50 <Coins size={16} className="text-amber-400 fill-amber-400" />
                                 </div>
                             </div>
                         </button>
