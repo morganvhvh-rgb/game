@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Handshake, Zap, Sparkles, Star, Coins } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Handshake, Zap, Sparkles, Star, Coins, Axis3d, Square } from 'lucide-react';
 import DealOption from './DealOption';
 import PlayingCard from './PlayingCard';
 
@@ -15,7 +15,9 @@ const ShopView = ({
     dealtCards,
     lotteryFail,
     purchaseCard,
-    balance
+    balance,
+    gridBuffs,
+    purchaseGridBuff
 }) => {
     return (
         <motion.div
@@ -112,16 +114,73 @@ const ShopView = ({
                             </div>
                         </button>
 
-                        {/* Grid Buff Placeholders */}
+                        {/* Grid Buff Placeholders -> Implemented */}
                         <div className="w-full flex flex-row items-stretch justify-center gap-2 sm:gap-4">
-                            <div className="flex-1 bg-stone-100 p-4 rounded-[1.5rem] border-2 border-stone-200 flex flex-col items-center justify-center text-center opacity-50">
-                                <span className="font-bold text-stone-400 text-sm uppercase">Grid Buff 1</span>
-                                <span className="text-xs text-stone-400">Placeholder</span>
-                            </div>
-                            <div className="flex-1 bg-stone-100 p-4 rounded-[1.5rem] border-2 border-stone-200 flex flex-col items-center justify-center text-center opacity-50">
-                                <span className="font-bold text-stone-400 text-sm uppercase">Grid Buff 2</span>
-                                <span className="text-xs text-stone-400">Placeholder</span>
-                            </div>
+                            {/* Slant Buff */}
+                            <button
+                                onClick={() => purchaseGridBuff('slant')}
+                                disabled={gridBuffs.slant || balance < 50}
+                                className={`
+                                    flex-1 p-4 rounded-[1.5rem] border-2 flex flex-col items-center justify-center text-center transition-all relative overflow-hidden
+                                    ${gridBuffs.slant
+                                        ? 'bg-red-50 border-red-200 opacity-60'
+                                        : balance < 50
+                                            ? 'bg-stone-100 border-stone-200 opacity-50 cursor-not-allowed'
+                                            : 'bg-white border-red-200 shadow-lg hover:scale-105 hover:shadow-red-200/50 cursor-pointer'
+                                    }
+                                `}
+                            >
+                                {gridBuffs.slant && (
+                                    <div className="absolute top-2 right-2 text-xs font-black bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                                        OWNED
+                                    </div>
+                                )}
+                                <div className={`mb-2 p-2 rounded-xl ${gridBuffs.slant ? 'bg-red-100 text-red-400' : 'bg-red-50 text-red-500'}`}>
+                                    <Axis3d size={24} />
+                                </div>
+                                <span className="font-bold text-stone-900 text-sm uppercase mb-1">Slant</span>
+                                <div className="text-xs text-stone-500 font-medium leading-tight mb-3">
+                                    Symbols match diagonally.
+                                </div>
+                                {!gridBuffs.slant && (
+                                    <div className="flex items-center gap-1 font-black text-sm text-stone-900 bg-stone-100 px-3 py-1 rounded-full">
+                                        50 <Coins size={12} className="text-amber-400 fill-amber-400" />
+                                    </div>
+                                )}
+                            </button>
+
+                            {/* Last Peach Buff */}
+                            <button
+                                onClick={() => purchaseGridBuff('lastPeach')}
+                                disabled={gridBuffs.lastPeach || balance < 100}
+                                className={`
+                                    flex-1 p-4 rounded-[1.5rem] border-2 flex flex-col items-center justify-center text-center transition-all relative overflow-hidden
+                                    ${gridBuffs.lastPeach
+                                        ? 'bg-orange-50 border-orange-200 opacity-60'
+                                        : balance < 100
+                                            ? 'bg-stone-100 border-stone-200 opacity-50 cursor-not-allowed'
+                                            : 'bg-white border-orange-200 shadow-lg hover:scale-105 hover:shadow-orange-200/50 cursor-pointer'
+                                    }
+                                `}
+                            >
+                                {gridBuffs.lastPeach && (
+                                    <div className="absolute top-2 right-2 text-xs font-black bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                                        OWNED
+                                    </div>
+                                )}
+                                <div className={`mb-2 p-2 rounded-xl ${gridBuffs.lastPeach ? 'bg-orange-100 text-orange-400' : 'bg-orange-50 text-orange-500'}`}>
+                                    <Square size={24} />
+                                </div>
+                                <span className="font-bold text-stone-900 text-sm uppercase mb-1">Last Peach</span>
+                                <div className="text-xs text-stone-500 font-medium leading-tight mb-3">
+                                    Peach in last square = 2x Total Win.
+                                </div>
+                                {!gridBuffs.lastPeach && (
+                                    <div className="flex items-center gap-1 font-black text-sm text-stone-900 bg-stone-100 px-3 py-1 rounded-full">
+                                        100 <Coins size={12} className="text-amber-400 fill-amber-400" />
+                                    </div>
+                                )}
+                            </button>
                         </div>
                     </motion.div>
                 ) : (

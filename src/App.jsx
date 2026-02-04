@@ -151,6 +151,23 @@ const App = () => {
         }
     };
 
+    // Grid Buff Logic
+    const [gridBuffs, setGridBuffs] = useState({
+        slant: false,
+        lastPeach: false
+    });
+
+    const purchaseGridBuff = (type) => {
+        let cost = 0;
+        if (type === 'slant') cost = 50;
+        if (type === 'lastPeach') cost = 100;
+
+        if (balance >= cost && !gridBuffs[type]) {
+            setBalance(prev => prev - cost);
+            setGridBuffs(prev => ({ ...prev, [type]: true }));
+        }
+    };
+
     const toggleLock = () => {
         if (isSpinning) return;
 
@@ -256,6 +273,74 @@ const App = () => {
             }
         });
 
+        // 1.5 Diagonal Checks (Slant Buff)
+        if (gridBuffs.slant) {
+            const diagonals = [
+                [0, 4, 8], // Top-Left to Bottom-Right
+                [2, 4, 6]  // Top-Right to Bottom-Left
+            ];
+
+            diagonals.forEach(indices => {
+                const diagSymbols = indices.map(i => newGrid[Math.floor(i / 3)][i % 3]);
+                const nonCandy = diagSymbols.find(s => s !== SYMBOLS.CANDY);
+
+                if (!nonCandy) {
+                    // All Candies Diagonally - Bonus? Let's treat as normal win for now.
+                    // Or maybe Wilds don't pay out on their own unless it's a specific wild mechanic.
+                    // Existing logic for rows handles "All Candies" as Jackpot check separately? 
+                    // No, "All Candies" check in rows assumes jackpot.
+                    // Let's stick to standard matching logic.
+                    // If all candies, it matches "nonCandy" which is undefined... wait.
+                    // Logic above: `if (!nonCandy)` -> All Candies.
+                    // If diagonal is all candies, let's just award a basic fruit win or something? 
+                    // Or just ignore "All Wilds" special case for diagonals to keep it simple unless specified.
+                    // Actually, if !nonCandy, it means 3 Wilds. 
+                    // Let's treat 3 Wilds as a "Cherry" match for simplicity if not specified, or just skip.
+                    // Re-reading row logic: if (!nonCandy) { totalWin += 100; ... } -> Jackpot.
+                    // Diagonal Jackpot? Why not.
+                    totalWin += 100;
+                    winningIndices.push(...indices);
+                    addFloatingWin(100, indices[1]);
+                } else {
+                    const isMatch = diagSymbols.every(s => {
+                        if (s === nonCandy) return true;
+                        if (s === SYMBOLS.CANDY) {
+                            if (currentBuffs.halloween && nonCandy === SYMBOLS.BOMB) return false;
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (isMatch) {
+                        let diagWin = 0;
+                        if (SYMBOLS.FRUIT.includes(nonCandy)) {
+                            let multiplier = 1;
+                            if (currentJuiceInPlay) multiplier *= 4;
+                            if (currentBuffs.grapeLove && nonCandy === '🍇') multiplier *= 2;
+                            // Other fruit multipliers apply too
+                            if (currentBuffs.devil && nonCandy === '🍇') multiplier *= 2;
+                            if (currentBuffs.angel && nonCandy === '🍒') multiplier *= 5;
+                            if (currentBuffs.orangutan && nonCandy === '🍌') multiplier *= 2;
+
+                            diagWin = 10 * multiplier;
+                            fruitWinOccurred = true;
+                        } else if (nonCandy === SYMBOLS.DIAMOND) {
+                            diagWin = 100;
+                        } else if (nonCandy === SYMBOLS.BOMB) {
+                            diagWin = -50;
+                            bombMatchOccurred = true;
+                        }
+
+                        if (diagWin !== 0) {
+                            totalWin += diagWin;
+                            winningIndices.push(...indices);
+                            addFloatingWin(diagWin, indices[1]);
+                        }
+                    }
+                }
+            });
+        }
+
         // 2. Vertical Checks (Orangutan Buff)
         if (currentBuffs.orangutan) {
             for (let col = 0; col < 3; col++) {
@@ -305,6 +390,13 @@ const App = () => {
 
         if (currentBuffs.mining && bombMatchOccurred) {
             setMiningTurns(3);
+        }
+
+        // Last Peach Buff
+        if (gridBuffs.lastPeach && newGrid[2][2] === '🍑') {
+            totalWin *= 2;
+            // Maybe add a visual indicator?
+            addFloatingWin("x2", 8); // 8 is index of bottom right
         }
 
         setJuiceBoxActiveNext(currentBuffs.juiceBox && fruitWinOccurred);
@@ -466,6 +558,8 @@ const App = () => {
                         lotteryFail={lotteryFail}
                         purchaseCard={purchaseCard}
                         balance={balance}
+                        gridBuffs={gridBuffs}
+                        purchaseGridBuff={purchaseGridBuff}
                     />
                 ) : (
                     <motion.div
