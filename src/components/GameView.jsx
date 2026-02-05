@@ -169,18 +169,29 @@ const GameView = ({
                                         animate={{
                                             x: isRevealed || (isTopLeft && lockedSymbol) ? 0 : -100,
                                             opacity: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0,
-                                            scale: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0.8
+                                            scale: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0.8,
+                                            borderColor: isWinning
+                                                ? [SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917', SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917', SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917']
+                                                : (idx === 8 && gridBuffs?.lastPeach ? '#f97316' : '#1c1917'),
+                                            borderWidth: (idx === 8 && gridBuffs?.lastPeach ? 4 : 2)
                                         }}
                                         transition={{
-                                            type: "spring",
-                                            bounce: 0.5,
-                                            duration: 0.6,
-                                            delay: (isRevealed || (isTopLeft && lockedSymbol)) ? ((idx % 3) * 0.0 + Math.floor(idx / 3) * 0.1) : 0
+                                            default: {
+                                                type: "spring",
+                                                bounce: 0.5,
+                                                duration: 0.6,
+                                                delay: (isRevealed || (isTopLeft && lockedSymbol)) ? ((idx % 3) * 0.0 + Math.floor(idx / 3) * 0.1) : 0
+                                            },
+                                            borderColor: {
+                                                duration: 1.0,
+                                                ease: "linear",
+                                                times: [0, 0.2, 0.4, 0.6, 0.8, 1]
+                                            },
+                                            borderWidth: { duration: 0.2 }
                                         }}
                                         className={`
-                                            relative bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-sm border-2
-                                            ${idx === 8 && gridBuffs?.lastPeach ? 'border-orange-500 border-4' : 'border-stone-900'}
-                                            ${isTopLeft ? 'cursor-pointer hover:bg-stone-50 transition-colors' : ''}
+                                            relative bg-stone-950 rounded-lg flex items-center justify-center overflow-hidden shadow-sm
+                                            ${isTopLeft ? 'cursor-pointer hover:bg-stone-900 transition-colors' : ''}
                                         `}
                                     >
                                         <AnimatePresence mode="wait">
@@ -238,14 +249,9 @@ const GameView = ({
                                             }}
                                             className="absolute inset-0 z-0"
                                             style={{
-                                                backgroundImage: `
-                                                    linear-gradient(135deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
-                                                    linear-gradient(225deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
-                                                    linear-gradient(45deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
-                                                    linear-gradient(315deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%)
-                                                `,
-                                                backgroundPosition: '10px 0, 10px 0, 0 0, 0 0',
+                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M0 0 L10 10 L20 0 L20 10 L10 20 L0 10 Z' fill='${encodeURIComponent(SYMBOL_COLORS[symbol] || '#9ca3af')}'/%3E%3C/svg%3E")`,
                                                 backgroundSize: '20px 20px',
+                                                backgroundRepeat: 'repeat',
                                             }}
                                         />
                                     </motion.div>
