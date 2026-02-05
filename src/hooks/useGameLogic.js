@@ -511,9 +511,9 @@ export const useGameLogic = () => {
                             if (prev === 0) setLockedSymbol(null);
                             return prev;
                         });
-                    }, 275);
+                    }, 500); // Increased post-spin delay slightly for rhythm
                 }
-            }, i * 165);
+            }, 300 + (i * 300)); // 300ms base delay + 300ms per column
         });
     };
 

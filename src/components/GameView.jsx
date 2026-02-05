@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutGrid, Lock, Unlock, Dumbbell, Info, Handshake, Zap, Sparkles, Star, ShoppingCart, ArrowLeft, Coins } from 'lucide-react';
-import { SYMBOLS, BUFF_DEFINITIONS } from '../data/gameConfig';
+import { SYMBOLS, BUFF_DEFINITIONS, SYMBOL_COLORS } from '../data/gameConfig';
 import PlayingCard from './PlayingCard';
 
 
@@ -163,9 +163,20 @@ const GameView = ({
                                 }
 
                                 return (
-                                    <div
+                                    <motion.div
                                         key={idx}
                                         onClick={isTopLeft ? toggleLock : undefined}
+                                        animate={{
+                                            x: isRevealed || (isTopLeft && lockedSymbol) ? 0 : -100,
+                                            opacity: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0,
+                                            scale: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0.8
+                                        }}
+                                        transition={{
+                                            type: "spring",
+                                            bounce: 0.5,
+                                            duration: 0.6,
+                                            delay: (isRevealed || (isTopLeft && lockedSymbol)) ? ((idx % 3) * 0.0 + Math.floor(idx / 3) * 0.1) : 0
+                                        }}
                                         className={`
                                             relative bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-sm border-2
                                             ${idx === 8 && gridBuffs?.lastPeach ? 'border-orange-500 border-4' : 'border-stone-900'}
@@ -176,19 +187,17 @@ const GameView = ({
                                             {isRevealed || (isTopLeft && lockedSymbol && isSpinning) ? (
                                                 <motion.div
                                                     key={`${idx}-${displaySymbol}`}
-                                                    initial={isTopLeft && lockedSymbol ? { x: 0, opacity: 1, scale: 1 } : { x: -50, opacity: 0, scale: 0.5 }}
                                                     animate={{
-                                                        x: 0,
-                                                        opacity: 1,
                                                         scale: isWinning ? [1, 1.5, 1] : 1,
                                                         rotate: isWinning ? [0, -5, 5, 0] : 0
                                                     }}
                                                     transition={{
                                                         default: { type: "spring", stiffness: 400, damping: 25 },
                                                         scale: { duration: 0.4, times: [0, 0.5, 1], repeat: 0 },
-                                                        delay: isWinning ? 0 : (Math.floor(idx / 3) * 0.05)
+                                                        delay: isWinning ? 0 : 0
                                                     }}
-                                                    className={`text-5xl sm:text-6xl z-10 ${isWinning ? 'drop-shadow-lg' : ''} relative`}
+                                                    className={`text-5xl sm:text-6xl z-10 relative`}
+                                                    style={{ textShadow: '3px 3px 0 #000' }}
                                                 >
                                                     {displaySymbol}
                                                     {/* Visual Indicators for Buff Activity */}
@@ -203,9 +212,7 @@ const GameView = ({
                                                     </div>
                                                 </motion.div>
                                             ) : (
-                                                <motion.div key="spinning" initial={{ opacity: 0 }} animate={{ opacity: 0.1 }} className="text-stone-900">
-
-                                                </motion.div>
+                                                <motion.div key="spinning" className="text-stone-900"></motion.div>
                                             )}
                                         </AnimatePresence>
 
@@ -219,20 +226,29 @@ const GameView = ({
                                             </div>
                                         )}
 
-                                        {isWinning && (
-                                            <motion.div
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: [0, 0.8, 0.8, 0] }}
-                                                transition={{
-                                                    duration: 1.2,
-                                                    times: [0, 0.1, 0.8, 1],
-                                                    ease: "easeInOut"
-                                                }}
-                                                style={{ backgroundColor: '#ff69b4' }}
-                                                className="absolute inset-0 z-0"
-                                            />
-                                        )}
-                                    </div>
+                                        {/* Neon Zig-Zag Background - Blink on Win */}
+                                        <motion.div
+                                            initial={{ opacity: 0.15 }}
+                                            animate={{
+                                                opacity: isWinning ? [0.15, 1, 0.5, 1, 0.5, 1, 0.15] : 0.15,
+                                            }}
+                                            transition={{
+                                                duration: isWinning ? 1.0 : 0.3,
+                                                ease: "linear"
+                                            }}
+                                            className="absolute inset-0 z-0"
+                                            style={{
+                                                backgroundImage: `
+                                                    linear-gradient(135deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
+                                                    linear-gradient(225deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
+                                                    linear-gradient(45deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%),
+                                                    linear-gradient(315deg, ${SYMBOL_COLORS[symbol] || '#9ca3af'} 25%, transparent 25%)
+                                                `,
+                                                backgroundPosition: '10px 0, 10px 0, 0 0, 0 0',
+                                                backgroundSize: '20px 20px',
+                                            }}
+                                        />
+                                    </motion.div>
                                 );
                             })}
                         </div>
