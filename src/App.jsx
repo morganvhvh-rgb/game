@@ -122,6 +122,11 @@ const App = () => {
                         gridBuffs={gridBuffs}
                         purchaseGridBuff={purchaseGridBuff}
                         unlockedItems={unlockedItems}
+                        // Shop Props
+                        shopPhase={shopPhase}
+                        dealtCards={dealtCards}
+                        purchaseCard={purchaseCard}
+                        buffs={buffs}
                     />
                 ) : (
                     <InfoView setView={setView} />

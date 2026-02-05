@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingCart, Star, Coins, Axis3d, Square, Lock } from 'lucide-react';
+import PlayingCard from './PlayingCard';
 
 const ExtrasView = ({
     onBack,
@@ -9,7 +10,12 @@ const ExtrasView = ({
     balance,
     gridBuffs,
     purchaseGridBuff,
-    unlockedItems = []
+    unlockedItems = [],
+    // Shop Props
+    shopPhase,
+    dealtCards = [],
+    purchaseCard,
+    buffs = {}
 }) => {
     return (
         <motion.div
@@ -77,6 +83,26 @@ const ExtrasView = ({
                         >
                             Bad luck! The lottery ticket was a dud.
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Won Cards Display */}
+                <AnimatePresence>
+                    {dealtCards.length > 0 && (
+                        <div className="w-full flex justify-center gap-4 py-2">
+                            {dealtCards.map((card, i) => (
+                                <div key={card.id} className="w-48">
+                                    <PlayingCard
+                                        card={card}
+                                        index={i}
+                                        owned={buffs[card.id]}
+                                        balance={balance}
+                                        onPurchase={() => purchaseCard(card)}
+                                        isGolden={true}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </AnimatePresence>
 
