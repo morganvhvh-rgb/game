@@ -68,7 +68,7 @@ const GameView = ({
         >
             {/* Grid Area - Toggles between Grid and Buff Shop */}
             {/* Grid Area - Toggles between Grid and Buff Shop */}
-            <div className={`relative w-full max-w-md aspect-square bg-stone-100 rounded-xl p-3 mb-4 shadow-hard border-2 transition-colors duration-500 overflow-hidden ${activeMiningTurns > 0 && !isBuffMenuOpen ? 'border-cyan-500 bg-cyan-50/50' : 'border-stone-900'}`}>
+            <div className={`relative w-full max-w-md aspect-square rounded-xl p-3 mb-4 shadow-hard transition-colors duration-500 overflow-hidden ${activeMiningTurns > 0 && !isBuffMenuOpen ? 'border-2 border-cyan-500 bg-cyan-950/30' : 'glass-panel'}`}>
                 {isBuffMenuOpen ? (
                     <motion.div
                         key="buff-shop-overlay"
@@ -89,21 +89,21 @@ const GameView = ({
                                         animate={{
                                             scale: isSelected ? 1.05 : 1,
                                             opacity: 1,
-                                            borderColor: isSelected ? '#fbbf24' : (isOwned ? '#e7e5e4' : '#1c1917')
+                                            borderColor: isSelected ? '#fbbf24' : (isOwned ? '#e7e5e4' : '#0f172a')
                                         }}
                                         transition={{ delay: i * 0.05 }}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => handleBuffClick(buff)}
                                         className={`
-                                            aspect-[2/3.2] rounded-lg shadow-sm border-2 border-stone-900 flex flex-col relative overflow-hidden cursor-pointer transition-colors bg-white w-full
-                                            ${isSelected ? 'ring-4 ring-amber-400 ring-offset-2 z-10' : ''}
-                                            ${isOwned ? 'bg-stone-100 opacity-60' : 'hover:border-amber-400'}
+                                            aspect-[2/3.2] rounded-lg shadow-sm border-2 border-slate-700 flex flex-col relative overflow-hidden cursor-pointer transition-colors w-full
+                                            ${isSelected ? 'ring-4 ring-blue-500 ring-offset-2 ring-offset-slate-900 z-10 bg-slate-700' : ''}
+                                            ${isOwned ? 'bg-slate-800 opacity-60' : 'bg-slate-700 hover:border-blue-400'}
                                         `}
                                     >
                                         {/* Dumbbell Icon Top-Left */}
                                         <div className="absolute top-1.5 left-1.5 z-10">
-                                            <Dumbbell size={12} className="fill-black text-black" />
+                                            <Dumbbell size={12} className="fill-slate-400 text-slate-400" />
                                         </div>
 
                                         {/* Status Indicators Top-Right */}
@@ -116,10 +116,10 @@ const GameView = ({
 
                                             {/* Description */}
                                             <div className="px-1 w-full text-center flex flex-col h-full">
-                                                <div className="text-xs leading-tight font-black uppercase text-stone-900 mb-1 break-words line-clamp-2">
+                                                <div className="text-xs leading-tight font-black uppercase text-white mb-1 break-words line-clamp-2">
                                                     {buff.title}
                                                 </div>
-                                                <div className="text-[0.6rem] leading-tight font-medium text-stone-500 line-clamp-3">
+                                                <div className="text-[0.6rem] leading-tight font-medium text-slate-400 line-clamp-3">
                                                     {buff.desc}
                                                 </div>
                                             </div>
@@ -128,14 +128,14 @@ const GameView = ({
                                         {/* Price / Buy Overlay */}
                                         {!isOwned ? (
                                             <div className="absolute bottom-1 w-full py-1 flex items-center justify-center gap-1">
-                                                <span className="text-[0.65rem] font-black uppercase text-black">
+                                                <span className="text-[0.65rem] font-black uppercase text-white">
                                                     50
                                                 </span>
                                                 <Coins size={10} className="text-amber-400" />
                                             </div>
                                         ) : (
                                             <div className="absolute bottom-1 w-full py-1 flex items-center justify-center gap-1">
-                                                <span className="text-[0.65rem] font-black uppercase text-stone-400">
+                                                <span className="text-[0.65rem] font-black uppercase text-slate-500">
                                                     PURCHASED
                                                 </span>
                                             </div>
@@ -171,8 +171,8 @@ const GameView = ({
                                             opacity: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0,
                                             scale: isRevealed || (isTopLeft && lockedSymbol) ? 1 : 0.8,
                                             borderColor: isWinning
-                                                ? [SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917', SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917', SYMBOL_COLORS[symbol] || '#1c1917', '#1c1917']
-                                                : (idx === 8 && gridBuffs?.lastPeach ? '#f97316' : '#1c1917'),
+                                                ? [SYMBOL_COLORS[symbol] || '#0f172a', '#3b82f6', SYMBOL_COLORS[symbol] || '#0f172a', '#3b82f6', SYMBOL_COLORS[symbol] || '#0f172a', '#3b82f6']
+                                                : (idx === 8 && gridBuffs?.lastPeach ? '#f97316' : '#0f172a'),
                                             borderWidth: (idx === 8 && gridBuffs?.lastPeach ? 4 : 2)
                                         }}
                                         transition={{
@@ -190,8 +190,8 @@ const GameView = ({
                                             borderWidth: { duration: 0.2 }
                                         }}
                                         className={`
-                                            relative bg-stone-950 rounded-lg flex items-center justify-center overflow-hidden shadow-sm
-                                            ${isTopLeft ? 'cursor-pointer hover:bg-stone-900 transition-colors' : ''}
+                                            relative bg-slate-950 rounded-lg flex items-center justify-center overflow-hidden shadow-sm
+                                            ${isTopLeft ? 'cursor-pointer hover:bg-slate-900 transition-colors' : ''}
                                         `}
                                     >
                                         <AnimatePresence mode="wait">
@@ -223,7 +223,7 @@ const GameView = ({
                                                     </div>
                                                 </motion.div>
                                             ) : (
-                                                <motion.div key="spinning" className="text-stone-900"></motion.div>
+                                                <motion.div key="spinning" className="text-slate-800"></motion.div>
                                             )}
                                         </AnimatePresence>
 
@@ -232,7 +232,7 @@ const GameView = ({
                                                 {lockedSymbol ? (
                                                     <Lock size={22} className="text-amber-500" />
                                                 ) : (
-                                                    <Unlock size={18} className="text-stone-200" />
+                                                    <Unlock size={18} className="text-slate-600" />
                                                 )}
                                             </div>
                                         )}
@@ -268,11 +268,11 @@ const GameView = ({
                                     animate={{ opacity: 1, y: -40, scale: 1.0 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.6, ease: "backOut" }}
-                                    className="absolute z-50 pointer-events-none font-black text-2xl text-black"
+                                    className="absolute z-50 pointer-events-none font-black text-2xl text-white"
                                     style={{
                                         left: `${(win.cellIndex % 3) * 33 + 16}%`,
                                         top: `${Math.floor(win.cellIndex / 3) * 33 + 16}%`,
-                                        textShadow: '3px 3px 0 #fff'
+                                        textShadow: '3px 3px 0 #000'
                                     }}
                                 >
                                     {win.val > 0 ? `+${win.val}` : win.val}
@@ -294,9 +294,9 @@ const GameView = ({
                             exit={{ opacity: 0, scale: 0.8 }}
                             className="absolute inset-0 flex items-center justify-center"
                         >
-                            <div className="text-stone-400 relative flex items-center justify-center">
+                            <div className="text-slate-400 relative flex items-center justify-center">
                                 <Dumbbell size={48} className="fill-current" />
-                                <span className="absolute top-full mt-2 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap text-stone-500">no buff cards</span>
+                                <span className="absolute top-full mt-2 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap text-slate-600">no buff cards</span>
                             </div>
                         </motion.div>
                     ) : (
@@ -317,15 +317,15 @@ const GameView = ({
                                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
                                     exit={{ scale: 0, opacity: 0 }}
                                     whileHover={{ scale: 1.15, y: -20, rotate: 0, zIndex: 50 }}
-                                    className="w-16 h-24 bg-white rounded-lg shadow-xl border-2 border-stone-900 flex flex-col items-center justify-between p-1 cursor-help relative origin-bottom transition-shadow hover:shadow-2xl pointer-events-auto"
+                                    className="w-16 h-24 bg-slate-800 rounded-lg shadow-glow border-2 border-slate-700 flex flex-col items-center justify-between p-1 cursor-help relative origin-bottom transition-all hover:shadow-2xl hover:border-blue-500 pointer-events-auto"
                                     style={{ zIndex: i }}
                                 >
-                                    <div className="absolute top-1 left-1"><Dumbbell size={8} className="fill-black text-black" /></div>
+                                    <div className="absolute top-1 left-1"><Dumbbell size={8} className="fill-slate-400 text-slate-400" /></div>
                                     <div className="flex-1 flex items-center justify-center">
                                         <span className="text-3xl filter drop-shadow-sm">{buff.icon}</span>
                                     </div>
-                                    <div className="w-full border-t-2 border-stone-900 pt-1">
-                                        <div className="text-[0.6rem] leading-none font-black uppercase text-stone-900 text-center w-full truncate">
+                                    <div className="w-full border-t-2 border-slate-600 pt-1">
+                                        <div className="text-[0.6rem] leading-none font-black uppercase text-white text-center w-full truncate">
                                             {buff.title}
                                         </div>
                                     </div>
@@ -344,10 +344,10 @@ const GameView = ({
                     onClick={handleSpin}
                     disabled={isSpinning || balance < 1 || isBuffMenuOpen}
                     className={`
-                        w-full py-4 rounded-lg text-xl font-black uppercase tracking-tight transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-stone-900
+                        w-full py-4 rounded-lg text-xl font-black uppercase tracking-tight transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-blue-900
                         ${isSpinning || balance < 1 || isBuffMenuOpen
-                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed shadow-none border-stone-200'
-                            : 'bg-stone-900 text-stone-50 hover:bg-black'}
+                            ? 'bg-slate-800 text-slate-600 cursor-not-allowed shadow-none border-slate-800'
+                            : 'bg-blue-600 text-white hover:bg-blue-500'}
                     `}
                 >
                     {isBuffMenuOpen ? (
@@ -375,11 +375,11 @@ const GameView = ({
                     className={`
                         w-full py-3 rounded-lg text-xl font-black uppercase tracking-tight border-2 transition-all flex items-center justify-center gap-2 shadow-hard active:translate-y-1 active:shadow-none
                         ${isBuffMenuOpen
-                            ? 'bg-red-500 text-white border-stone-900 hover:bg-red-600'
-                            : 'bg-amber-400 text-stone-900 border-stone-900 hover:bg-amber-500'}
+                            ? 'bg-red-600 text-white border-red-800 hover:bg-red-500'
+                            : 'bg-amber-400 text-amber-950 border-amber-600 hover:bg-amber-300'}
                     `}
                 >
-                    {isBuffMenuOpen ? <ArrowLeft size={24} className="text-white" /> : <Dumbbell size={20} className="fill-stone-900 text-stone-900" />}
+                    {isBuffMenuOpen ? <ArrowLeft size={24} className="text-white" /> : <Dumbbell size={20} className="fill-amber-950 text-amber-950" />}
                     {isBuffMenuOpen ? 'Back to Reel' : 'Buff Cards'}
                 </motion.button>
                 <div className="flex gap-3">
@@ -387,16 +387,16 @@ const GameView = ({
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setView('extras')}
-                        className="flex-1 py-3 rounded-lg bg-stone-900 text-stone-50 font-bold border-2 border-stone-900 hover:bg-black transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+                        className="flex-1 py-3 rounded-lg bg-slate-800 text-blue-200 font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                     >
-                        <Star size={20} className="text-stone-50" />
+                        <Star size={20} className="text-blue-400" />
                         EXTRAS
                     </motion.button>
                     <motion.button
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setView('info')}
-                        className="flex-1 py-3 rounded-lg bg-white text-stone-600 font-bold border-2 border-stone-900 hover:text-stone-900 hover:bg-stone-50 transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+                        className="flex-1 py-3 rounded-lg bg-slate-800 text-blue-200 font-bold border-2 border-slate-700 hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                     >
                         <Info size={20} />
                         INFO

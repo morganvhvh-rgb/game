@@ -12,13 +12,13 @@ const Header = ({
     isSpinning
 }) => {
     return (
-        <div className="w-full max-w-md flex justify-between items-center mb-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-hard border-2 border-stone-900">
+        <div className="w-full max-w-md flex justify-between items-center mb-2 glass-panel px-4 py-2 rounded-xl shadow-hard">
             <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
                     <div className="text-amber-400 shrink-0">
                         <Coins size={28} />
                     </div>
-                    <motion.span className="text-2xl font-black tabular-nums tracking-tighter leading-none text-stone-900">{displayBalance}</motion.span>
+                    <motion.span className="text-2xl font-black tabular-nums tracking-tighter leading-none text-slate-100">{displayBalance}</motion.span>
                 </div>
                 {/* Active Buffs Indicators */}
                 <div className="flex gap-2">

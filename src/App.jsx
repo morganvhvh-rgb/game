@@ -70,7 +70,7 @@ const App = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-2 md:p-4 select-none">
+        <div className="min-h-screen bg-slate-950 bg-subtle-glow text-slate-100 font-sans flex flex-col items-center p-2 md:p-4 select-none overflow-x-hidden">
             {/* Header / Stats */}
             <Header
                 displayBalance={displayBalance}
@@ -141,9 +141,9 @@ const App = () => {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-black/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-hard border-4 border-red-600 relative overflow-hidden"
+                            className="bg-slate-950/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-glow shadow-hard border-4 border-red-600 relative overflow-hidden"
                         >
-                            <div className="mb-4 bg-stone-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border-2 border-red-900/50">
+                            <div className="mb-4 bg-slate-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border-2 border-red-900/50">
                                 <TrendingUp size={40} />
                             </div>
 
@@ -171,14 +171,14 @@ const App = () => {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-stone-900/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-hard border-4 border-stone-800 relative overflow-hidden"
+                            className="bg-slate-950/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-glow shadow-hard border-4 border-slate-700 relative overflow-hidden"
                         >
                             <div className="mb-6 relative">
                                 <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-1">Game Over</h2>
                             </div>
 
                             <div className="mb-6">
-                                <div className="text-stone-400 text-xs font-bold uppercase tracking-wider mb-1">Highest Spinflation</div>
+                                <div className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Highest Spinflation</div>
                                 <div className="text-3xl font-black text-red-500">{spinCost}</div>
                             </div>
 
@@ -199,7 +199,7 @@ const App = () => {
 
                             <button
                                 onClick={resetGame}
-                                className="w-full py-4 bg-white hover:bg-stone-200 text-stone-900 font-black rounded-lg uppercase tracking-widest transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-stone-900"
+                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-lg uppercase tracking-widest transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-blue-800"
                             >
                                 Play Again
                             </button>

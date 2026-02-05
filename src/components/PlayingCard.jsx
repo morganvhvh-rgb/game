@@ -14,8 +14,8 @@ const PlayingCard = ({ card, index, owned, balance, onPurchase, isGolden }) => {
                 relative rounded-[1.5rem] p-4 shadow-xl border-2 flex flex-col items-center text-center
                 w-full aspect-[2/3] sm:aspect-[9/16] transition-all duration-300
                 ${isGolden
-                    ? 'bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-stone-900 shadow-amber-300/50 scale-105'
-                    : (owned ? 'border-stone-100 bg-stone-50' : 'bg-white border-stone-900')
+                    ? 'bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-slate-900 shadow-amber-300/50 scale-105'
+                    : (owned ? 'border-slate-100 bg-slate-50' : 'bg-white border-slate-900')
                 }
             `}
         >
@@ -27,18 +27,18 @@ const PlayingCard = ({ card, index, owned, balance, onPurchase, isGolden }) => {
                 {card.icon}
             </div>
 
-            <h3 className={`font-black uppercase tracking-tight mb-2 leading-tight ${isGolden ? 'text-xl sm:text-2xl text-stone-900' : 'text-sm sm:text-lg'}`}>
+            <h3 className={`font-black uppercase tracking-tight mb-2 leading-tight ${isGolden ? 'text-xl sm:text-2xl text-slate-900' : 'text-sm sm:text-lg'}`}>
                 {card.title}
             </h3>
 
-            <p className={`font-bold leading-snug px-2 flex-1 flex items-center justify-center ${isGolden ? 'text-sm sm:text-base text-stone-800' : 'text-[10px] sm:text-xs text-stone-500 font-medium'}`}>
+            <p className={`font-bold leading-snug px-2 flex-1 flex items-center justify-center ${isGolden ? 'text-sm sm:text-base text-slate-800' : 'text-[10px] sm:text-xs text-slate-500 font-medium'}`}>
                 {card.desc}
             </p>
 
             <div className="w-full mt-auto pt-4 relative z-10">
                 {owned ? (
-                    <div className={`w-full py-3 rounded-xl font-black text-xs uppercase flex items-center justify-center gap-1 ${isGolden ? 'bg-stone-900/10 text-stone-900' : 'bg-stone-200 text-stone-400'}`}>
-                        <Star size={14} className={isGolden ? "fill-stone-900" : "fill-stone-400"} /> Owned
+                    <div className={`w-full py-3 rounded-xl font-black text-xs uppercase flex items-center justify-center gap-1 ${isGolden ? 'bg-slate-900/10 text-slate-900' : 'bg-slate-200 text-slate-400'}`}>
+                        <Star size={14} className={isGolden ? "fill-slate-900" : "fill-slate-400"} /> Owned
                     </div>
                 ) : (
                     <button
@@ -47,8 +47,8 @@ const PlayingCard = ({ card, index, owned, balance, onPurchase, isGolden }) => {
                         className={`
                             w-full py-3 rounded-xl font-black uppercase tracking-tight text-lg flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-hard-sm border-2
                             ${isGolden
-                                ? (isAffordable ? 'bg-stone-900 text-white border-stone-900 hover:bg-black' : 'bg-stone-400 text-stone-200 border-stone-500 cursor-not-allowed')
-                                : (isAffordable ? 'bg-amber-400 text-white border-transparent hover:bg-amber-500' : 'bg-stone-200 text-stone-400 border-transparent cursor-not-allowed')
+                                ? (isAffordable ? 'bg-slate-900 text-white border-slate-900 hover:bg-black' : 'bg-slate-400 text-slate-200 border-slate-500 cursor-not-allowed')
+                                : (isAffordable ? 'bg-amber-400 text-white border-transparent hover:bg-amber-500' : 'bg-slate-200 text-slate-400 border-transparent cursor-not-allowed')
                             }
                         `}
                     >
