@@ -29,9 +29,9 @@ const InfoView = ({ setView }) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full flex flex-col max-w-md h-[calc(100vh-100px)] px-1"
+            className="w-full flex flex-col max-w-md h-[calc(100vh-100px)] px-0"
         >
-            <div className="w-full mb-2 flex justify-between items-center py-2 px-1">
+            <div className="w-full mb-2 flex justify-between items-center py-2 px-4">
                 <button
                     onClick={() => setView('game')}
                     className="flex items-center gap-2 text-stone-500 hover:text-stone-900 font-black transition-colors text-xs uppercase tracking-wide group"
@@ -41,7 +41,7 @@ const InfoView = ({ setView }) => {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto pb-8 no-scrollbar px-4">
                 <div className="flex items-baseline justify-between px-1 mb-2">
                     <h1 className="text-2xl font-black text-stone-900">Game Guide</h1>
                 </div>

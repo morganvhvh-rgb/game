@@ -70,7 +70,7 @@ const App = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-4 md:p-8 select-none">
+        <div className="min-h-screen bg-stone-50 text-stone-900 font-sans flex flex-col items-center p-2 md:p-4 select-none">
             {/* Header / Stats */}
             <Header
                 displayBalance={displayBalance}
