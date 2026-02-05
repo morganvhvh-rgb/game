@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutGrid, Lock, Unlock, Dumbbell, Info, Handshake, Zap, Sparkles, Star, ShoppingCart } from 'lucide-react';
+import { LayoutGrid, Lock, Unlock, Dumbbell, Info, Handshake, Zap, Sparkles, Star, ShoppingCart, ArrowLeft, Coins } from 'lucide-react';
 import { SYMBOLS, BUFF_DEFINITIONS } from '../data/gameConfig';
 import PlayingCard from './PlayingCard';
 
@@ -108,7 +108,7 @@ const GameView = ({
 
                                         {/* Status Indicators Top-Right */}
                                         <div className="absolute top-1 right-1 flex flex-col gap-1 items-end">
-                                            {isOwned && <div className="w-2 h-2 rounded-full bg-green-400" />}
+                                            {/* Removed Green Dot */}
                                         </div>
 
                                         <div className="flex-1 flex flex-col items-center justify-start pt-5">
@@ -125,11 +125,18 @@ const GameView = ({
                                             </div>
                                         </div>
 
-                                        {/* Buy Overlay for Selected */}
-                                        {isSelected && !isOwned && (
-                                            <div className="absolute bottom-0 w-full bg-amber-400 py-1 flex items-center justify-center">
-                                                <span className="text-[0.65rem] font-black uppercase text-stone-900">
-                                                    50 Coins
+                                        {/* Price / Buy Overlay */}
+                                        {!isOwned ? (
+                                            <div className="absolute bottom-1 w-full py-1 flex items-center justify-center gap-1">
+                                                <span className="text-[0.65rem] font-black uppercase text-black">
+                                                    50
+                                                </span>
+                                                <Coins size={10} className="text-amber-400" />
+                                            </div>
+                                        ) : (
+                                            <div className="absolute bottom-1 w-full py-1 flex items-center justify-center gap-1">
+                                                <span className="text-[0.65rem] font-black uppercase text-stone-400">
+                                                    PURCHASED
                                                 </span>
                                             </div>
                                         )}
@@ -313,18 +320,29 @@ const GameView = ({
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleSpin}
-                    disabled={isSpinning || balance < 1}
+                    disabled={isSpinning || balance < 1 || isBuffMenuOpen}
                     className={`
                         w-full py-5 rounded-[2rem] text-2xl font-black uppercase tracking-tight transition-all shadow-xl
-                        ${isSpinning || balance < 1
+                        ${isSpinning || balance < 1 || isBuffMenuOpen
                             ? 'bg-stone-200 text-stone-400 cursor-not-allowed shadow-none'
                             : 'bg-stone-900 text-stone-50 hover:bg-black'}
                     `}
                 >
-                    <span className="flex flex-col items-center leading-none gap-1">
-                        <span>{isSpinning ? 'SPINNING...' : 'Pull Lever'}</span>
-                        <span className={`text-xs font-bold tracking-wide ${isSpinning ? 'opacity-0' : 'opacity-50'}`}>{spinCost} Coin{spinCost > 1 ? 's' : ''}</span>
-                    </span>
+                    {isBuffMenuOpen ? (
+                        <span className="flex flex-col items-center leading-none gap-1">
+                            <span className="flex items-center gap-2">
+                                <Dumbbell size={24} className="fill-current text-current" />
+                                BUFF CARDS
+                            </span>
+                            {/* Invisible spacer to match height */}
+                            <span className="text-xs font-bold tracking-wide opacity-0">SPACER</span>
+                        </span>
+                    ) : (
+                        <span className="flex flex-col items-center leading-none gap-1">
+                            <span>{isSpinning ? 'SPINNING...' : 'Pull Lever'}</span>
+                            <span className={`text-xs font-bold tracking-wide ${isSpinning ? 'opacity-0' : 'opacity-50'}`}>{spinCost} Coin{spinCost > 1 ? 's' : ''}</span>
+                        </span>
+                    )}
                 </motion.button>
 
                 <motion.button
@@ -334,10 +352,12 @@ const GameView = ({
                     disabled={isSpinning}
                     className={`
                         w-full py-4 rounded-[1.5rem] text-2xl font-black uppercase tracking-tight border-2 transition-colors flex items-center justify-center gap-2
-                        ${isBuffMenuOpen ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-900 border-stone-100 hover:border-amber-200'}
+                        ${isBuffMenuOpen
+                            ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                            : 'bg-amber-400 text-stone-900 border-amber-400 hover:bg-amber-500'}
                     `}
                 >
-                    <Dumbbell size={20} className={isBuffMenuOpen ? "fill-white text-white" : "fill-black text-black"} />
+                    {isBuffMenuOpen ? <ArrowLeft size={24} className="text-white" /> : <Dumbbell size={20} className="fill-stone-900 text-stone-900" />}
                     {isBuffMenuOpen ? 'Back to Reel' : 'Buff Cards'}
                 </motion.button>
                 <div className="flex gap-3">

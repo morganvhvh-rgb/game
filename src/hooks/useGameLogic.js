@@ -506,9 +506,9 @@ export const useGameLogic = () => {
                             if (prev === 0) setLockedSymbol(null);
                             return prev;
                         });
-                    }, 250);
+                    }, 275);
                 }
-            }, i * 150);
+            }, i * 165);
         });
     };
 
