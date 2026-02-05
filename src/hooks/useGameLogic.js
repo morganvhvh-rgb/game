@@ -287,7 +287,6 @@ export const useGameLogic = () => {
                 const isMatch = row.every(s => {
                     if (s === nonCandy) return true;
                     if (s === SYMBOLS.CANDY) {
-                        if (currentBuffs.halloween && nonCandy === SYMBOLS.BOMB) return false;
                         return true;
                     }
                     return false;
@@ -339,7 +338,6 @@ export const useGameLogic = () => {
                     const isMatch = diagSymbols.every(s => {
                         if (s === nonCandy) return true;
                         if (s === SYMBOLS.CANDY) {
-                            if (currentBuffs.halloween && nonCandy === SYMBOLS.BOMB) return false;
                             return true;
                         }
                         return false;

@@ -111,15 +111,15 @@ const GameView = ({
                                             {/* Removed Green Dot */}
                                         </div>
 
-                                        <div className="flex-1 flex flex-col items-center justify-start pt-4">
+                                        <div className="flex-1 flex flex-col items-center justify-start pt-2">
                                             <div className="text-3xl filter drop-shadow-sm mb-1">{buff.icon}</div>
 
                                             {/* Description */}
                                             <div className="px-1 w-full text-center flex flex-col h-full">
-                                                <div className="text-[0.65rem] leading-tight font-black uppercase text-stone-900 mb-1 break-words line-clamp-2">
+                                                <div className="text-xs leading-tight font-black uppercase text-stone-900 mb-1 break-words line-clamp-2">
                                                     {buff.title}
                                                 </div>
-                                                <div className="text-[0.55rem] leading-tight font-medium text-stone-500 line-clamp-3">
+                                                <div className="text-[0.6rem] leading-tight font-medium text-stone-500 line-clamp-3">
                                                     {buff.desc}
                                                 </div>
                                             </div>
@@ -365,9 +365,9 @@ const GameView = ({
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setView('extras')}
-                        className="flex-1 py-3 rounded-lg bg-white text-stone-900 font-bold border-2 border-stone-900 hover:bg-stone-50 transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+                        className="flex-1 py-3 rounded-lg bg-stone-900 text-stone-50 font-bold border-2 border-stone-900 hover:bg-black transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                     >
-                        <Star size={20} className="text-amber-500" />
+                        <Star size={20} className="text-stone-50" />
                         EXTRAS
                     </motion.button>
                     <motion.button

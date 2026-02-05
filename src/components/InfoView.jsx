@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Lock, TrendingUp, Square, Axis3d } from 'lucide-react';
+import { ArrowLeft, Lock, TrendingUp, SquareDot, Axis3d } from 'lucide-react';
 import { LOCK_DURATION } from '../data/gameConfig';
 
 const CompactInfoCard = ({ icon, label, sub, val, color }) => (
@@ -96,12 +96,12 @@ const InfoView = ({ setView }) => {
                 <div className="flex flex-col gap-2">
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-2.5 rounded-lg border-2 border-orange-100 flex items-center gap-3 shadow-hard-sm">
                         <div className="p-2 bg-white rounded-lg shadow-sm text-orange-500 border border-orange-100">
-                            <Square size={16} />
+                            <SquareDot size={16} />
                         </div>
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-0.5">
                                 <h4 className="font-bold text-xs uppercase text-orange-900">Last Peach</h4>
-                                <span className="text-[9px] font-black bg-white/60 px-1.5 py-0.5 rounded text-orange-600 border border-orange-100">64 COST</span>
+                                <span className="text-[9px] font-black bg-white/60 px-1.5 py-0.5 rounded text-orange-600 border border-orange-100">SPINFLATION 64</span>
                             </div>
                             <p className="text-[10px] text-orange-800/70 font-medium leading-tight">2x Multiplier if 'Peach' lands in the very last square.</p>
                         </div>
@@ -114,7 +114,7 @@ const InfoView = ({ setView }) => {
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-0.5">
                                 <h4 className="font-bold text-xs uppercase text-purple-900">Slant</h4>
-                                <span className="text-[9px] font-black bg-white/60 px-1.5 py-0.5 rounded text-purple-600 border border-purple-100">128 COST</span>
+                                <span className="text-[9px] font-black bg-white/60 px-1.5 py-0.5 rounded text-purple-600 border border-purple-100">SPINFLATION 128</span>
                             </div>
                             <p className="text-[10px] text-purple-800/70 font-medium leading-tight">Enables diagonal matches for all symbols.</p>
                         </div>
