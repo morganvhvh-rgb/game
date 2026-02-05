@@ -38,7 +38,7 @@ export const useGameLogic = () => {
 
     // Check for Game Over
     useEffect(() => {
-        if (!isSpinning && balance < spinCost && view === 'game' && !gameOver) {
+        if (!isSpinning && balance < spinCost && !gameOver) {
             // Check if we achieved any unlocks
             const earnedUnlocks = [];
             if (spinCost >= 64 && !unlockedItems.includes('lastPeach')) {
@@ -58,7 +58,7 @@ export const useGameLogic = () => {
             }
             setGameOver(true);
         }
-    }, [balance, spinCost, isSpinning, view, gameOver, unlockedItems]);
+    }, [balance, spinCost, isSpinning, gameOver, unlockedItems]);
 
     // Save unlocks effect (redundant but safe)
     useEffect(() => {
@@ -146,6 +146,13 @@ export const useGameLogic = () => {
             lastPeach: false
         });
         setNewUnlocks([]);
+        setLotteryFail(false);
+        setView('game');
+    };
+
+    const returnToGame = () => {
+        setLotteryFail(false);
+        setView('game');
     };
 
     const enterShop = () => {
@@ -557,6 +564,7 @@ export const useGameLogic = () => {
         toggleLock,
         handleSpin,
         activeBuffList,
+        returnToGame
         // Exposing setBalance if needed for debug etc, but logic should handle it
     };
 };

@@ -48,6 +48,7 @@ const App = () => {
         toggleLock,
         handleSpin,
         activeBuffList,
+        returnToGame,
     } = useGameLogic();
 
     const [isBuffMenuOpen, setIsBuffMenuOpen] = React.useState(false);
@@ -114,7 +115,7 @@ const App = () => {
                     />
                 ) : view === 'extras' ? (
                     <ExtrasView
-                        setView={setView}
+                        onBack={returnToGame}
                         handleLottery={handleLottery}
                         lotteryFail={lotteryFail}
                         balance={balance}
@@ -135,9 +136,9 @@ const App = () => {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-black rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-4 border-red-600 relative overflow-hidden"
+                            className="bg-black/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-hard border-4 border-red-600 relative overflow-hidden"
                         >
-                            <div className="mb-4 bg-stone-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border border-red-900/50">
+                            <div className="mb-4 bg-stone-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner border-2 border-red-900/50">
                                 <TrendingUp size={40} />
                             </div>
 
@@ -148,7 +149,7 @@ const App = () => {
 
                             <button
                                 onClick={() => setShowSpinflation(false)}
-                                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl uppercase tracking-widest transition-colors shadow-lg hover:shadow-red-500/30 ring-offset-2 focus:ring-2 ring-red-500 ring-offset-black"
+                                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-lg uppercase tracking-widest transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-red-800"
                             >
                                 PROCEED
                             </button>
@@ -165,7 +166,7 @@ const App = () => {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-stone-900 rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl border-2 border-stone-800 relative overflow-hidden"
+                            className="bg-stone-900/95 backdrop-blur-md rounded-xl p-8 max-w-sm w-full text-center shadow-hard border-4 border-stone-800 relative overflow-hidden"
                         >
                             <div className="mb-6 relative">
                                 <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-1">Game Over</h2>
@@ -193,7 +194,7 @@ const App = () => {
 
                             <button
                                 onClick={resetGame}
-                                className="w-full py-4 bg-white hover:bg-stone-200 text-stone-900 font-black rounded-xl uppercase tracking-widest transition-colors shadow-lg ring-offset-2 focus:ring-2 ring-white ring-offset-stone-900"
+                                className="w-full py-4 bg-white hover:bg-stone-200 text-stone-900 font-black rounded-lg uppercase tracking-widest transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-stone-900"
                             >
                                 Play Again
                             </button>

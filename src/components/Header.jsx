@@ -12,7 +12,7 @@ const Header = ({
     isSpinning
 }) => {
     return (
-        <div className="w-full max-w-md flex justify-between items-center mb-2 bg-white px-6 py-2 rounded-[2rem] shadow-sm border border-stone-200 sticky top-4 z-50">
+        <div className="w-full max-w-md flex justify-between items-center mb-4 bg-white/90 backdrop-blur-md px-6 py-3 rounded-xl shadow-hard border-2 border-stone-900 sticky top-4 z-50">
             <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
                     <div className="text-amber-400 shrink-0">

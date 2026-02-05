@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingCart, Star, Coins, Axis3d, Square, Lock } from 'lucide-react';
 
 const ExtrasView = ({
-    setView,
+    onBack,
     handleLottery,
     lotteryFail,
     balance,
@@ -21,7 +21,7 @@ const ExtrasView = ({
             {/* Header */}
             <div className="w-full mb-6">
                 <button
-                    onClick={() => setView('game')}
+                    onClick={onBack}
                     className="flex items-center gap-2 text-stone-500 hover:text-stone-900 font-bold transition-colors mb-4"
                 >
                     <ArrowLeft size={18} />
@@ -42,16 +42,16 @@ const ExtrasView = ({
                     onClick={handleLottery}
                     disabled={balance < 50}
                     className={`
-                        w-full bg-stone-900 p-4 rounded-[1.5rem] shadow-xl border-2 border-stone-800
+                        w-full bg-stone-900 p-4 rounded-lg shadow-hard border-2 border-stone-900
                         flex items-center justify-between text-white transition-all
-                        ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-2xl hover:bg-black'}
+                        ${balance < 50 ? 'opacity-50 cursor-not-allowed shadow-none' : 'hover:bg-black active:translate-y-1 active:shadow-none'}
                     `}
                 >
                     <div className="flex items-center gap-4">
                         <Star size={32} className="text-yellow-400 animate-pulse" />
                         <div className="text-left">
                             <h3 className="font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
-                                Lottery Chance
+                                {lotteryFail ? 'Try Again' : 'Lottery Chance'}
                             </h3>
                             <p className="text-xs text-stone-400 font-medium">20% Chance to buy an S-Tier Buff</p>
                         </div>
@@ -68,10 +68,11 @@ const ExtrasView = ({
                 <AnimatePresence>
                     {lotteryFail && (
                         <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="w-full bg-red-100 border border-red-200 text-red-600 rounded-xl p-3 text-center text-sm font-bold"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="w-full bg-red-100 border-2 border-red-200 text-red-600 rounded-lg p-3 text-center text-sm font-bold shadow-hard-sm"
                         >
                             Bad luck! The lottery ticket was a dud.
                         </motion.div>
@@ -86,10 +87,10 @@ const ExtrasView = ({
                             onClick={() => purchaseGridBuff('lastPeach')}
                             disabled={gridBuffs.lastPeach || balance < 50}
                             className={`
-                                flex-1 px-2 py-3 rounded-2xl border-b-4 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
+                                flex-1 px-2 py-3 rounded-lg border-2 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
                                 ${gridBuffs.lastPeach
                                     ? 'bg-stone-100 border-stone-200 opacity-60'
-                                    : `bg-orange-400 border-orange-600 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-lg hover:brightness-110 cursor-pointer'}`
+                                    : `bg-orange-400 border-stone-900 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-hard hover:bg-orange-500 active:translate-y-1 active:shadow-none cursor-pointer'}`
                                 }
                             `}
                         >
@@ -126,10 +127,10 @@ const ExtrasView = ({
                             onClick={() => purchaseGridBuff('slant')}
                             disabled={gridBuffs.slant || balance < 50}
                             className={`
-                                flex-1 px-2 py-3 rounded-2xl border-b-4 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
+                                flex-1 px-2 py-3 rounded-lg border-2 flex flex-col items-center justify-start text-center transition-all relative overflow-hidden group
                                 ${gridBuffs.slant
                                     ? 'bg-stone-100 border-stone-200 opacity-60'
-                                    : `bg-red-500 border-red-700 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-lg hover:brightness-110 cursor-pointer'}`
+                                    : `bg-red-500 border-stone-900 ${balance < 50 ? 'opacity-50 cursor-not-allowed' : 'shadow-hard hover:bg-red-600 active:translate-y-1 active:shadow-none cursor-pointer'}`
                                 }
                             `}
                         >
@@ -149,7 +150,7 @@ const ExtrasView = ({
                             )}
                         </button>
                     ) : (
-                        <div className="flex-1 px-2 py-3 rounded-2xl border-2 border-stone-200 bg-stone-100 flex flex-col items-center justify-center text-center opacity-50 relative overflow-hidden">
+                        <div className="flex-1 px-2 py-3 rounded-lg border-2 border-stone-200 bg-stone-100 flex flex-col items-center justify-center text-center opacity-50 relative overflow-hidden">
                             <div className="text-stone-300 mb-2">
                                 <Lock size={28} />
                             </div>

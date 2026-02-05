@@ -67,8 +67,7 @@ const GameView = ({
             className="w-full flex flex-col items-center"
         >
             {/* Grid Area - Toggles between Grid and Buff Shop */}
-            {/* Grid Area - Toggles between Grid and Buff Shop */}
-            <div className={`relative w-full max-w-md aspect-square bg-stone-100 rounded-[3rem] p-4 mb-4 shadow-inner border transition-colors duration-500 overflow-hidden ${activeMiningTurns > 0 && !isBuffMenuOpen ? 'border-cyan-300 bg-cyan-50/30' : 'border-stone-200'}`}>
+            <div className={`relative w-full max-w-md aspect-square bg-stone-100 rounded-xl p-4 mb-6 shadow-hard border-2 transition-colors duration-500 overflow-hidden ${activeMiningTurns > 0 && !isBuffMenuOpen ? 'border-cyan-500 bg-cyan-50/50' : 'border-stone-900'}`}>
                 {isBuffMenuOpen ? (
                     <motion.div
                         key="buff-shop-overlay"
@@ -89,16 +88,16 @@ const GameView = ({
                                         animate={{
                                             scale: isSelected ? 1.05 : 1,
                                             opacity: 1,
-                                            borderColor: isSelected ? '#fbbf24' : (isOwned ? '#e7e5e4' : '#e7e5e4')
+                                            borderColor: isSelected ? '#fbbf24' : (isOwned ? '#e7e5e4' : '#1c1917')
                                         }}
                                         transition={{ delay: i * 0.05 }}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => handleBuffClick(buff)}
                                         className={`
-                                            aspect-[2/3.2] rounded-xl shadow-sm border-2 flex flex-col relative overflow-hidden cursor-pointer transition-colors bg-white w-full
-                                            ${isSelected ? 'ring-2 ring-amber-400 ring-offset-2 z-10' : ''}
-                                            ${isOwned ? 'bg-stone-100 opacity-60' : 'hover:border-amber-200'}
+                                            aspect-[2/3.2] rounded-lg shadow-sm border-2 flex flex-col relative overflow-hidden cursor-pointer transition-colors bg-white w-full
+                                            ${isSelected ? 'ring-4 ring-amber-400 ring-offset-2 z-10' : ''}
+                                            ${isOwned ? 'bg-stone-100 opacity-60' : 'hover:border-amber-400'}
                                         `}
                                     >
                                         {/* Dumbbell Icon Top-Left */}
@@ -167,9 +166,9 @@ const GameView = ({
                                         key={idx}
                                         onClick={isTopLeft ? toggleLock : undefined}
                                         className={`
-                                            relative bg-white rounded-[1.5rem] flex items-center justify-center overflow-hidden shadow-sm border
-                                            ${idx === 8 && gridBuffs?.lastPeach ? 'border-orange-400 border-2' : 'border-stone-50'}
-                                            ${isTopLeft ? 'cursor-pointer hover:brightness-95 transition-all' : ''}
+                                            relative bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-sm border-2
+                                            ${idx === 8 && gridBuffs?.lastPeach ? 'border-orange-500 border-4' : 'border-stone-900'}
+                                            ${isTopLeft ? 'cursor-pointer hover:bg-stone-50 transition-colors' : ''}
                                         `}
                                     >
                                         <AnimatePresence mode="wait">
@@ -229,7 +228,7 @@ const GameView = ({
                                                     ease: "easeInOut"
                                                 }}
                                                 style={{ backgroundColor: '#ff69b4' }}
-                                                className="absolute inset-0 rounded-[1.5rem] z-0"
+                                                className="absolute inset-0 z-0"
                                             />
                                         )}
                                     </div>
@@ -322,9 +321,9 @@ const GameView = ({
                     onClick={handleSpin}
                     disabled={isSpinning || balance < 1 || isBuffMenuOpen}
                     className={`
-                        w-full py-5 rounded-[2rem] text-2xl font-black uppercase tracking-tight transition-all shadow-xl
+                        w-full py-5 rounded-lg text-2xl font-black uppercase tracking-tight transition-all shadow-hard active:translate-y-1 active:shadow-none border-2 border-stone-900
                         ${isSpinning || balance < 1 || isBuffMenuOpen
-                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed shadow-none'
+                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed shadow-none border-stone-200'
                             : 'bg-stone-900 text-stone-50 hover:bg-black'}
                     `}
                 >
@@ -351,10 +350,10 @@ const GameView = ({
                     onClick={() => setIsBuffMenuOpen(!isBuffMenuOpen)}
                     disabled={isSpinning}
                     className={`
-                        w-full py-4 rounded-[1.5rem] text-2xl font-black uppercase tracking-tight border-2 transition-colors flex items-center justify-center gap-2
+                        w-full py-4 rounded-lg text-2xl font-black uppercase tracking-tight border-2 transition-all flex items-center justify-center gap-2 shadow-hard active:translate-y-1 active:shadow-none
                         ${isBuffMenuOpen
-                            ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
-                            : 'bg-amber-400 text-stone-900 border-amber-400 hover:bg-amber-500'}
+                            ? 'bg-red-500 text-white border-stone-900 hover:bg-red-600'
+                            : 'bg-amber-400 text-stone-900 border-stone-900 hover:bg-amber-500'}
                     `}
                 >
                     {isBuffMenuOpen ? <ArrowLeft size={24} className="text-white" /> : <Dumbbell size={20} className="fill-stone-900 text-stone-900" />}
@@ -365,7 +364,7 @@ const GameView = ({
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setView('extras')}
-                        className="flex-1 py-4 rounded-[1.5rem] bg-white text-stone-900 font-bold border-2 border-stone-100 hover:text-stone-900 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 py-4 rounded-lg bg-white text-stone-900 font-bold border-2 border-stone-900 hover:bg-stone-50 transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                     >
                         <Star size={20} className="text-amber-500" />
                         EXTRAS
@@ -374,7 +373,7 @@ const GameView = ({
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setView('info')}
-                        className="flex-1 py-4 rounded-[1.5rem] bg-white text-stone-500 font-bold border-2 border-stone-100 hover:text-stone-900 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 py-4 rounded-lg bg-white text-stone-500 font-bold border-2 border-stone-900 hover:text-stone-900 hover:bg-stone-50 transition-all flex items-center justify-center gap-2 shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                     >
                         <Info size={20} />
                         INFO
